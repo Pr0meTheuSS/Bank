@@ -1,0 +1,32 @@
+type FullName {
+  name: String!
+  second_name: String!
+  last_name: String!
+}
+
+type User {
+  id: ID!
+  fullname: FullName!
+  email: String!
+
+  passport_data: String!
+  birth_date: DateTime!
+}
+
+type Query {
+  users: [User!]!
+}
+
+input NewUserInput {
+  name: String!
+  second_name: String!
+  last_name: String!
+
+  passport_data: String!
+  birth_date: String!
+  email: String!
+}
+
+type Mutation {
+  createUser(input: NewUserInput!): User!
+}
