@@ -1,14 +1,7 @@
 package config
 
-import (
-	"github.com/joho/godotenv"
-)
-
-func Load(path string) error {
-	err := godotenv.Load(path)
-	if err != nil {
-		return err
-	}
-
-	return nil
+type Config struct {
+	// Environment string `env:"ENVIRONMENT,required"`
+	Version string `env:"VERSION,required"`
+	Port    int    `env:"PORT,required"`
 }
