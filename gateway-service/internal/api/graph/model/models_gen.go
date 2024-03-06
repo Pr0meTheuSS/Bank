@@ -2,6 +2,17 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+	"time"
+)
+
+type DeleteUserInput struct {
+	ID string `json:"id"`
+}
+
 type FullName struct {
 	Name       string `json:"name"`
 	SecondName string `json:"second_name"`
@@ -12,15 +23,27 @@ type Mutation struct {
 }
 
 type NewUserInput struct {
-	Name         string `json:"name"`
-	SecondName   string `json:"second_name"`
-	LastName     string `json:"last_name"`
-	PassportData string `json:"passport_data"`
-	BirthDate    string `json:"birth_date"`
-	Email        string `json:"email"`
+	FirstName    string    `json:"first_name"`
+	SecondName   string    `json:"second_name"`
+	LastName     string    `json:"last_name"`
+	PassportData string    `json:"passport_data"`
+	BirthDate    time.Time `json:"birth_date"`
+	Email        string    `json:"email"`
+	Job          string    `json:"job"`
+	Role         Role      `json:"role"`
 }
 
 type Query struct {
+}
+
+type UpdateUserInput struct {
+	FirstName    *string    `json:"first_name,omitempty"`
+	SecondName   *string    `json:"second_name,omitempty"`
+	LastName     *string    `json:"last_name,omitempty"`
+	PassportData *string    `json:"passport_data,omitempty"`
+	BirthDate    *time.Time `json:"birth_date,omitempty"`
+	Email        *string    `json:"email,omitempty"`
+	Job          *string    `json:"job,omitempty"`
 }
 
 type User struct {
@@ -28,5 +51,49 @@ type User struct {
 	Fullname     *FullName `json:"fullname"`
 	Email        string    `json:"email"`
 	PassportData string    `json:"passport_data"`
-	BirthDate    string    `json:"birth_date"`
+	BirthDate    time.Time `json:"birth_date"`
+	Role         Role      `json:"role"`
+}
+
+type Role string
+
+const (
+	RoleAdmin    Role = "ADMIN"
+	RoleEmployee Role = "EMPLOYEE"
+	RoleClient   Role = "CLIENT"
+)
+
+var AllRole = []Role{
+	RoleAdmin,
+	RoleEmployee,
+	RoleClient,
+}
+
+func (e Role) IsValid() bool {
+	switch e {
+	case RoleAdmin, RoleEmployee, RoleClient:
+		return true
+	}
+	return false
+}
+
+func (e Role) String() string {
+	return string(e)
+}
+
+func (e *Role) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Role(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Role", str)
+	}
+	return nil
+}
+
+func (e Role) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

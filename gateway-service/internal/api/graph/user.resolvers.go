@@ -6,30 +6,65 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"gateway/internal/api/graph/model"
+	"gateway/internal/users"
+	"strconv"
+
+	"github.com/sirupsen/logrus"
+)
+
+var (
+	ErrInputFormat = errors.New("catch format error in your request")
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUserInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+	logrus.Info("mutationResolver.CreateUser(ctx context.Context, input model.NewUserInput) called")
+	uinfo := &users.UserInfo{
+		FirstName:  input.FirstName,
+		LastName:   input.SecondName,
+		SecondName: input.LastName,
+		Email:      input.Email,
+
+		PassportData: input.PassportData,
+		BirthDate:    input.BirthDate,
+	}
+
+	user, err := r.UserServer.Create(ctx, uinfo)
+	return mapUserToDTOUser(user), err
 }
 
-// Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	return []*model.User{
-		{
-			ID: "1",
-			Fullname: &model.FullName{
-				Name:       "Name",
-				SecondName: "SecondName",
-				LastName:   "LastName",
-			},
-			Email:        "email@mail.com",
-			PassportData: "passport data",
-			BirthDate:    "01-01-1971",
-		},
-	}, nil
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+}
+
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context, input model.DeleteUserInput) (bool, error) {
+	ID, err := strconv.Atoi(input.ID)
+	if err != nil {
+		return false, ErrInputFormat
+	}
+
+	return r.UserServer.Delete(ctx, ID)
+}
+
+// GetAllUsers is the resolver for the getAllUsers field.
+func (r *queryResolver) GetAllUsers(ctx context.Context) ([]*model.User, error) {
+	users, err := r.UserServer.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	usersDTO := make([]*model.User, 0)
+
+	for _, u := range users {
+		usersDTO = append(usersDTO, mapUserToDTOUser(u))
+	}
+
+	return usersDTO, nil
 }
 
 // Mutation returns MutationResolver implementation.

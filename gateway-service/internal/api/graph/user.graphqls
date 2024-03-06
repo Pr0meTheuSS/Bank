@@ -4,29 +4,57 @@ type FullName {
   last_name: String!
 }
 
+enum Role {
+  ADMIN
+  EMPLOYEE
+  CLIENT
+}
+
 type User {
   id: ID!
   fullname: FullName!
   email: String!
 
   passport_data: String!
-  birth_date: DateTime!
+  birth_date: Time!
+
+  role: Role!
 }
 
 type Query {
-  users: [User!]!
+  getAllUsers: [User!]!
 }
 
 input NewUserInput {
-  name: String!
+  first_name: String!
   second_name: String!
   last_name: String!
 
   passport_data: String!
-  birth_date: String!
+  birth_date: Time!
   email: String!
+  job: String!
+
+  role: Role!
+}
+
+input UpdateUserInput {
+  first_name: String
+  second_name: String
+  last_name: String
+
+  passport_data: String
+  birth_date: Time
+  email: String
+  job: String
+}
+
+input DeleteUserInput {
+  id: ID!
 }
 
 type Mutation {
   createUser(input: NewUserInput!): User!
+  updateUser(input: UpdateUserInput!): User!
+  deleteUser(input: DeleteUserInput!): Boolean!
 }
