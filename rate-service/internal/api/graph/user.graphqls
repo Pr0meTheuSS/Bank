@@ -1,0 +1,42 @@
+type FullName {
+  name: String!
+  second_name: String!
+  last_name: String!
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+  CLIENT
+}
+
+type User {
+  id: ID!
+  fullname: FullName!
+  email: String!
+
+  passport_data: String!
+  birth_date: Time!
+
+  role: Role!
+}
+
+type Query {
+  users: [User!]!
+}
+
+input NewUserInput {
+  name: String!
+  second_name: String!
+  last_name: String!
+
+  passport_data: String!
+  birth_date: Time!
+  email: String!
+
+  role: Role!
+}
+
+type Mutation {
+  createUser(input: NewUserInput!): User!
+}
