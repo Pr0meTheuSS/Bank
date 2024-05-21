@@ -1,0 +1,78 @@
+enum PaymentType {
+  Annuity
+  DIFFERENTIATED
+}
+
+scalar Time
+
+type Credit {
+  id: Int!
+  userID: Int!
+  applicationID: Int!
+
+  body: Int!
+  percents: Int!
+  fine: Int!
+  commission: Int!
+
+  isActive: Boolean!
+  paymentType: PaymentType!
+  interestRate: Float!
+  loanTermMonths: Int!
+
+  startDate: Time!
+  endDate: Time!
+}
+
+input CreateCreditRequest {
+  userID: Int!
+  applicationID: Int!
+
+  body: Int!
+  percents: Int!
+  fine: Int!
+  commission: Int!
+
+  isActive: Boolean!
+  paymentType: PaymentType!
+  interestRate: Float!
+  loanTermMonths: Int!
+
+  startDate: Time!
+  endDate: Time!
+}
+
+input UpdateCreditRequest {
+  id: Int!
+
+  userID: Int
+  applicationID: Int
+
+  body: Int
+  percents: Int
+  fine: Int
+  commission: Int
+
+  isActive: Boolean
+
+  paymentType: PaymentType
+  interestRate: Float
+  loanTermMonths: Int
+
+  startDate: Time
+  endDate: Time
+}
+
+  type CreateCreditResponse {
+    success: Boolean!
+    credit: Credit
+  }
+
+  type UpdateCreditResponse {
+    success: Boolean!
+    credit: Credit
+  }
+
+type DeleteCreditResponse {
+  success: Boolean!
+}

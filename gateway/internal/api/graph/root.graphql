@@ -1,0 +1,56 @@
+type Query {
+  """
+  Return all users.
+  """
+  GetUsers(limit: Int, offset: Int): [User!]!
+  """
+  Return user by email.
+  """
+  GetUserByEmail(email: String!): User!
+
+
+  getCredits(limit: Int, offset: Int): [Credit!]!
+}
+
+type Mutation {
+  """
+  Sign in
+  """
+  register(input: RegistrationRequest!): RegistrationResponse!
+
+  """
+  Sign up
+  """
+  login(input: LoginRequest!): LoginResponse!
+
+
+  """
+  Create user
+  """
+  createUser(input: CreateUserInput!): CreateUserResponse!
+
+  """
+  Update user
+  """
+  updateUser(input: UpdateUserRequest!): UpdateUserResponse!
+
+  """
+  Delete user
+  """
+  deleteUser(userID: Int!): DeleteUserResponse!
+
+
+
+  """
+  Create credit
+  """
+  createCredit(input: CreateCreditRequest!): CreateCreditResponse!
+  """
+  Update credit
+  """
+  updateCredit(input: UpdateCreditRequest!): UpdateCreditResponse!
+  """
+  Delete credit
+  """
+  deleteCredit(creditID: Int!): DeleteCreditResponse!
+}

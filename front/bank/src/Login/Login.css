@@ -1,0 +1,5 @@
+body {
+  background: url('.././assets/handshake.jpg') no-repeat center 0 fixed;
+  overflow: auto;
+  background-size: 100vw 100vh;
+}
