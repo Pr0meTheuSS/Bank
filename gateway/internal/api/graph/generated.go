@@ -53,6 +53,10 @@ type ComplexityRoot struct {
 		Success func(childComplexity int) int
 	}
 
+	CreateCreditTariffResponse struct {
+		Status func(childComplexity int) int
+	}
+
 	CreateUserResponse struct {
 		Status func(childComplexity int) int
 	}
@@ -73,8 +77,25 @@ type ComplexityRoot struct {
 		UserID         func(childComplexity int) int
 	}
 
+	CreditTariff struct {
+		Description     func(childComplexity int) int
+		ID              func(childComplexity int) int
+		MaxAmount       func(childComplexity int) int
+		MaxInterestRate func(childComplexity int) int
+		MaxTermMonth    func(childComplexity int) int
+		MinAmount       func(childComplexity int) int
+		MinInterestRate func(childComplexity int) int
+		MinTermMonth    func(childComplexity int) int
+		Name            func(childComplexity int) int
+		PaymentType     func(childComplexity int) int
+	}
+
 	DeleteCreditResponse struct {
 		Success func(childComplexity int) int
+	}
+
+	DeleteCreditTariffResponse struct {
+		Status func(childComplexity int) int
 	}
 
 	DeleteUserResponse struct {
@@ -87,20 +108,25 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateCredit func(childComplexity int, input model.CreateCreditRequest) int
-		CreateUser   func(childComplexity int, input model.CreateUserInput) int
-		DeleteCredit func(childComplexity int, creditID int) int
-		DeleteUser   func(childComplexity int, userID int) int
-		Login        func(childComplexity int, input model.LoginRequest) int
-		Register     func(childComplexity int, input model.RegistrationRequest) int
-		UpdateCredit func(childComplexity int, input model.UpdateCreditRequest) int
-		UpdateUser   func(childComplexity int, input model.UpdateUserRequest) int
+		CreateCredit       func(childComplexity int, input model.CreateCreditRequest) int
+		CreateCreditTariff func(childComplexity int, input model.CreditTariffInput) int
+		CreateUser         func(childComplexity int, input model.CreateUserInput) int
+		DeleteCredit       func(childComplexity int, creditID int) int
+		DeleteCreditTariff func(childComplexity int, id int) int
+		DeleteUser         func(childComplexity int, userID int) int
+		Login              func(childComplexity int, input model.LoginRequest) int
+		Register           func(childComplexity int, input model.RegistrationRequest) int
+		UpdateCredit       func(childComplexity int, input model.UpdateCreditRequest) int
+		UpdateCreditTariff func(childComplexity int, id int, input model.CreditTariffInput) int
+		UpdateUser         func(childComplexity int, input model.UpdateUserRequest) int
 	}
 
 	Query struct {
-		GetCredits     func(childComplexity int, limit *int, offset *int) int
-		GetUserByEmail func(childComplexity int, email string) int
-		GetUsers       func(childComplexity int, limit *int, offset *int) int
+		GetCreditTariffByID func(childComplexity int, id string) int
+		GetCreditTariffs    func(childComplexity int, limit *int, offset *int) int
+		GetCredits          func(childComplexity int, limit *int, offset *int) int
+		GetUserByEmail      func(childComplexity int, email string) int
+		GetUsers            func(childComplexity int, limit *int, offset *int) int
 	}
 
 	RegistrationResponse struct {
@@ -110,6 +136,10 @@ type ComplexityRoot struct {
 	UpdateCreditResponse struct {
 		Credit  func(childComplexity int) int
 		Success func(childComplexity int) int
+	}
+
+	UpdateCreditTariffResponse struct {
+		Status func(childComplexity int) int
 	}
 
 	UpdateUserResponse struct {
@@ -141,11 +171,16 @@ type MutationResolver interface {
 	CreateCredit(ctx context.Context, input model.CreateCreditRequest) (*model.CreateCreditResponse, error)
 	UpdateCredit(ctx context.Context, input model.UpdateCreditRequest) (*model.UpdateCreditResponse, error)
 	DeleteCredit(ctx context.Context, creditID int) (*model.DeleteCreditResponse, error)
+	CreateCreditTariff(ctx context.Context, input model.CreditTariffInput) (*model.CreateCreditTariffResponse, error)
+	UpdateCreditTariff(ctx context.Context, id int, input model.CreditTariffInput) (*model.UpdateCreditTariffResponse, error)
+	DeleteCreditTariff(ctx context.Context, id int) (*model.DeleteCreditTariffResponse, error)
 }
 type QueryResolver interface {
 	GetUsers(ctx context.Context, limit *int, offset *int) ([]*model.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*model.User, error)
 	GetCredits(ctx context.Context, limit *int, offset *int) ([]*model.Credit, error)
+	GetCreditTariffByID(ctx context.Context, id string) (*model.CreditTariff, error)
+	GetCreditTariffs(ctx context.Context, limit *int, offset *int) ([]*model.CreditTariff, error)
 }
 
 type executableSchema struct {
@@ -180,6 +215,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreateCreditResponse.Success(childComplexity), true
+
+	case "CreateCreditTariffResponse.status":
+		if e.complexity.CreateCreditTariffResponse.Status == nil {
+			break
+		}
+
+		return e.complexity.CreateCreditTariffResponse.Status(childComplexity), true
 
 	case "CreateUserResponse.status":
 		if e.complexity.CreateUserResponse.Status == nil {
@@ -279,12 +321,89 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Credit.UserID(childComplexity), true
 
+	case "CreditTariff.description":
+		if e.complexity.CreditTariff.Description == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.Description(childComplexity), true
+
+	case "CreditTariff.id":
+		if e.complexity.CreditTariff.ID == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.ID(childComplexity), true
+
+	case "CreditTariff.maxAmount":
+		if e.complexity.CreditTariff.MaxAmount == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.MaxAmount(childComplexity), true
+
+	case "CreditTariff.maxInterestRate":
+		if e.complexity.CreditTariff.MaxInterestRate == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.MaxInterestRate(childComplexity), true
+
+	case "CreditTariff.maxTermMonth":
+		if e.complexity.CreditTariff.MaxTermMonth == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.MaxTermMonth(childComplexity), true
+
+	case "CreditTariff.minAmount":
+		if e.complexity.CreditTariff.MinAmount == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.MinAmount(childComplexity), true
+
+	case "CreditTariff.minInterestRate":
+		if e.complexity.CreditTariff.MinInterestRate == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.MinInterestRate(childComplexity), true
+
+	case "CreditTariff.minTermMonth":
+		if e.complexity.CreditTariff.MinTermMonth == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.MinTermMonth(childComplexity), true
+
+	case "CreditTariff.name":
+		if e.complexity.CreditTariff.Name == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.Name(childComplexity), true
+
+	case "CreditTariff.paymentType":
+		if e.complexity.CreditTariff.PaymentType == nil {
+			break
+		}
+
+		return e.complexity.CreditTariff.PaymentType(childComplexity), true
+
 	case "DeleteCreditResponse.success":
 		if e.complexity.DeleteCreditResponse.Success == nil {
 			break
 		}
 
 		return e.complexity.DeleteCreditResponse.Success(childComplexity), true
+
+	case "DeleteCreditTariffResponse.status":
+		if e.complexity.DeleteCreditTariffResponse.Status == nil {
+			break
+		}
+
+		return e.complexity.DeleteCreditTariffResponse.Status(childComplexity), true
 
 	case "DeleteUserResponse.status":
 		if e.complexity.DeleteUserResponse.Status == nil {
@@ -319,6 +438,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateCredit(childComplexity, args["input"].(model.CreateCreditRequest)), true
 
+	case "Mutation.createCreditTariff":
+		if e.complexity.Mutation.CreateCreditTariff == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createCreditTariff_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateCreditTariff(childComplexity, args["input"].(model.CreditTariffInput)), true
+
 	case "Mutation.createUser":
 		if e.complexity.Mutation.CreateUser == nil {
 			break
@@ -342,6 +473,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteCredit(childComplexity, args["creditID"].(int)), true
+
+	case "Mutation.deleteCreditTariff":
+		if e.complexity.Mutation.DeleteCreditTariff == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteCreditTariff_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteCreditTariff(childComplexity, args["id"].(int)), true
 
 	case "Mutation.deleteUser":
 		if e.complexity.Mutation.DeleteUser == nil {
@@ -391,6 +534,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateCredit(childComplexity, args["input"].(model.UpdateCreditRequest)), true
 
+	case "Mutation.updateCreditTariff":
+		if e.complexity.Mutation.UpdateCreditTariff == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateCreditTariff_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCreditTariff(childComplexity, args["id"].(int), args["input"].(model.CreditTariffInput)), true
+
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
 			break
@@ -402,6 +557,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(model.UpdateUserRequest)), true
+
+	case "Query.GetCreditTariffByID":
+		if e.complexity.Query.GetCreditTariffByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_GetCreditTariffByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetCreditTariffByID(childComplexity, args["id"].(string)), true
+
+	case "Query.GetCreditTariffs":
+		if e.complexity.Query.GetCreditTariffs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_GetCreditTariffs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetCreditTariffs(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
 
 	case "Query.getCredits":
 		if e.complexity.Query.GetCredits == nil {
@@ -459,6 +638,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateCreditResponse.Success(childComplexity), true
+
+	case "UpdateCreditTariffResponse.status":
+		if e.complexity.UpdateCreditTariffResponse.Status == nil {
+			break
+		}
+
+		return e.complexity.UpdateCreditTariffResponse.Status(childComplexity), true
 
 	case "UpdateUserResponse.status":
 		if e.complexity.UpdateUserResponse.Status == nil {
@@ -561,6 +747,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateCreditRequest,
 		ec.unmarshalInputCreateUserInput,
+		ec.unmarshalInputCreditTariffInput,
 		ec.unmarshalInputLoginRequest,
 		ec.unmarshalInputRegistrationRequest,
 		ec.unmarshalInputRegistrationUserInput,
@@ -662,7 +849,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "root.graphql" "credit/schema.graphqls" "user/schema.graphqls"
+//go:embed "root.graphql" "credit/schema.graphqls" "tariff/schema.graphqls" "user/schema.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -676,6 +863,7 @@ func sourceData(filename string) string {
 var sources = []*ast.Source{
 	{Name: "root.graphql", Input: sourceData("root.graphql"), BuiltIn: false},
 	{Name: "credit/schema.graphqls", Input: sourceData("credit/schema.graphqls"), BuiltIn: false},
+	{Name: "tariff/schema.graphqls", Input: sourceData("tariff/schema.graphqls"), BuiltIn: false},
 	{Name: "user/schema.graphqls", Input: sourceData("user/schema.graphqls"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -683,6 +871,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createCreditTariff_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CreditTariffInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreditTariffInput2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditTariffInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createCredit_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -711,6 +914,21 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteCreditTariff_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -774,6 +992,30 @@ func (ec *executionContext) field_Mutation_register_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateCreditTariff_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.CreditTariffInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNCreditTariffInput2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditTariffInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateCredit_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -801,6 +1043,45 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_GetCreditTariffByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_GetCreditTariffs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg1
 	return args, nil
 }
 
@@ -1028,6 +1309,50 @@ func (ec *executionContext) fieldContext_CreateCreditResponse_credit(ctx context
 				return ec.fieldContext_Credit_endDate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Credit", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateCreditTariffResponse_status(ctx context.Context, field graphql.CollectedField, obj *model.CreateCreditTariffResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateCreditTariffResponse_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateCreditTariffResponse_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateCreditTariffResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1649,6 +1974,443 @@ func (ec *executionContext) fieldContext_Credit_endDate(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _CreditTariff_id(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreditTariff_name(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreditTariff_minAmount(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_minAmount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MinAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_minAmount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreditTariff_maxAmount(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_maxAmount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_maxAmount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreditTariff_minInterestRate(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_minInterestRate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MinInterestRate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_minInterestRate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreditTariff_maxInterestRate(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_maxInterestRate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxInterestRate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_maxInterestRate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreditTariff_paymentType(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_paymentType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PaymentType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.PaymentType)
+	fc.Result = res
+	return ec.marshalNPaymentType2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐPaymentType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_paymentType(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PaymentType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreditTariff_minTermMonth(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_minTermMonth(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MinTermMonth, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_minTermMonth(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreditTariff_maxTermMonth(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_maxTermMonth(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxTermMonth, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_maxTermMonth(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreditTariff_description(ctx context.Context, field graphql.CollectedField, obj *model.CreditTariff) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreditTariff_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreditTariff_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreditTariff",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DeleteCreditResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.DeleteCreditResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DeleteCreditResponse_success(ctx, field)
 	if err != nil {
@@ -1688,6 +2450,50 @@ func (ec *executionContext) fieldContext_DeleteCreditResponse_success(ctx contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteCreditTariffResponse_status(ctx context.Context, field graphql.CollectedField, obj *model.DeleteCreditTariffResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteCreditTariffResponse_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteCreditTariffResponse_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteCreditTariffResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2329,6 +3135,183 @@ func (ec *executionContext) fieldContext_Mutation_deleteCredit(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createCreditTariff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createCreditTariff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateCreditTariff(rctx, fc.Args["input"].(model.CreditTariffInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CreateCreditTariffResponse)
+	fc.Result = res
+	return ec.marshalNCreateCreditTariffResponse2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreateCreditTariffResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createCreditTariff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "status":
+				return ec.fieldContext_CreateCreditTariffResponse_status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateCreditTariffResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createCreditTariff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateCreditTariff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateCreditTariff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateCreditTariff(rctx, fc.Args["id"].(int), fc.Args["input"].(model.CreditTariffInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateCreditTariffResponse)
+	fc.Result = res
+	return ec.marshalNUpdateCreditTariffResponse2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUpdateCreditTariffResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateCreditTariff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "status":
+				return ec.fieldContext_UpdateCreditTariffResponse_status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateCreditTariffResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateCreditTariff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteCreditTariff(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteCreditTariff(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteCreditTariff(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteCreditTariffResponse)
+	fc.Result = res
+	return ec.marshalNDeleteCreditTariffResponse2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐDeleteCreditTariffResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteCreditTariff(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "status":
+				return ec.fieldContext_DeleteCreditTariffResponse_status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteCreditTariffResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteCreditTariff_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_GetUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_GetUsers(ctx, field)
 	if err != nil {
@@ -2350,14 +3333,11 @@ func (ec *executionContext) _Query_GetUsers(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.([]*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_GetUsers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2512,14 +3492,11 @@ func (ec *executionContext) _Query_getCredits(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.([]*model.Credit)
 	fc.Result = res
-	return ec.marshalNCredit2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditᚄ(ctx, field.Selections, res)
+	return ec.marshalOCredit2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCredit(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getCredits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2568,6 +3545,154 @@ func (ec *executionContext) fieldContext_Query_getCredits(ctx context.Context, f
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getCredits_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_GetCreditTariffByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetCreditTariffByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetCreditTariffByID(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CreditTariff)
+	fc.Result = res
+	return ec.marshalOCreditTariff2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditTariff(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_GetCreditTariffByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CreditTariff_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CreditTariff_name(ctx, field)
+			case "minAmount":
+				return ec.fieldContext_CreditTariff_minAmount(ctx, field)
+			case "maxAmount":
+				return ec.fieldContext_CreditTariff_maxAmount(ctx, field)
+			case "minInterestRate":
+				return ec.fieldContext_CreditTariff_minInterestRate(ctx, field)
+			case "maxInterestRate":
+				return ec.fieldContext_CreditTariff_maxInterestRate(ctx, field)
+			case "paymentType":
+				return ec.fieldContext_CreditTariff_paymentType(ctx, field)
+			case "minTermMonth":
+				return ec.fieldContext_CreditTariff_minTermMonth(ctx, field)
+			case "maxTermMonth":
+				return ec.fieldContext_CreditTariff_maxTermMonth(ctx, field)
+			case "description":
+				return ec.fieldContext_CreditTariff_description(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreditTariff", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_GetCreditTariffByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_GetCreditTariffs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetCreditTariffs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetCreditTariffs(rctx, fc.Args["limit"].(*int), fc.Args["offset"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.CreditTariff)
+	fc.Result = res
+	return ec.marshalOCreditTariff2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditTariff(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_GetCreditTariffs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CreditTariff_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CreditTariff_name(ctx, field)
+			case "minAmount":
+				return ec.fieldContext_CreditTariff_minAmount(ctx, field)
+			case "maxAmount":
+				return ec.fieldContext_CreditTariff_maxAmount(ctx, field)
+			case "minInterestRate":
+				return ec.fieldContext_CreditTariff_minInterestRate(ctx, field)
+			case "maxInterestRate":
+				return ec.fieldContext_CreditTariff_maxInterestRate(ctx, field)
+			case "paymentType":
+				return ec.fieldContext_CreditTariff_paymentType(ctx, field)
+			case "minTermMonth":
+				return ec.fieldContext_CreditTariff_minTermMonth(ctx, field)
+			case "maxTermMonth":
+				return ec.fieldContext_CreditTariff_maxTermMonth(ctx, field)
+			case "description":
+				return ec.fieldContext_CreditTariff_description(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreditTariff", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_GetCreditTariffs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2855,6 +3980,50 @@ func (ec *executionContext) fieldContext_UpdateCreditResponse_credit(ctx context
 				return ec.fieldContext_Credit_endDate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Credit", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateCreditTariffResponse_status(ctx context.Context, field graphql.CollectedField, obj *model.UpdateCreditTariffResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateCreditTariffResponse_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateCreditTariffResponse_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateCreditTariffResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5399,6 +6568,89 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreditTariffInput(ctx context.Context, obj interface{}) (model.CreditTariffInput, error) {
+	var it model.CreditTariffInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "minAmount", "maxAmount", "minInterestRate", "maxInterestRate", "paymentType", "minTermMonth", "maxTermMonth", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "minAmount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("minAmount"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MinAmount = data
+		case "maxAmount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxAmount"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxAmount = data
+		case "minInterestRate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("minInterestRate"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MinInterestRate = data
+		case "maxInterestRate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxInterestRate"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxInterestRate = data
+		case "paymentType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paymentType"))
+			data, err := ec.unmarshalNPaymentType2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐPaymentType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentType = data
+		case "minTermMonth":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("minTermMonth"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MinTermMonth = data
+		case "maxTermMonth":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxTermMonth"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxTermMonth = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputLoginRequest(ctx context.Context, obj interface{}) (model.LoginRequest, error) {
 	var it model.LoginRequest
 	asMap := map[string]interface{}{}
@@ -5814,6 +7066,45 @@ func (ec *executionContext) _CreateCreditResponse(ctx context.Context, sel ast.S
 	return out
 }
 
+var createCreditTariffResponseImplementors = []string{"CreateCreditTariffResponse"}
+
+func (ec *executionContext) _CreateCreditTariffResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CreateCreditTariffResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createCreditTariffResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateCreditTariffResponse")
+		case "status":
+			out.Values[i] = ec._CreateCreditTariffResponse_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createUserResponseImplementors = []string{"CreateUserResponse"}
 
 func (ec *executionContext) _CreateUserResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CreateUserResponse) graphql.Marshaler {
@@ -5952,6 +7243,87 @@ func (ec *executionContext) _Credit(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var creditTariffImplementors = []string{"CreditTariff"}
+
+func (ec *executionContext) _CreditTariff(ctx context.Context, sel ast.SelectionSet, obj *model.CreditTariff) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, creditTariffImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreditTariff")
+		case "id":
+			out.Values[i] = ec._CreditTariff_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._CreditTariff_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "minAmount":
+			out.Values[i] = ec._CreditTariff_minAmount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "maxAmount":
+			out.Values[i] = ec._CreditTariff_maxAmount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "minInterestRate":
+			out.Values[i] = ec._CreditTariff_minInterestRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "maxInterestRate":
+			out.Values[i] = ec._CreditTariff_maxInterestRate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "paymentType":
+			out.Values[i] = ec._CreditTariff_paymentType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "minTermMonth":
+			out.Values[i] = ec._CreditTariff_minTermMonth(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "maxTermMonth":
+			out.Values[i] = ec._CreditTariff_maxTermMonth(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._CreditTariff_description(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deleteCreditResponseImplementors = []string{"DeleteCreditResponse"}
 
 func (ec *executionContext) _DeleteCreditResponse(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteCreditResponse) graphql.Marshaler {
@@ -5965,6 +7337,45 @@ func (ec *executionContext) _DeleteCreditResponse(ctx context.Context, sel ast.S
 			out.Values[i] = graphql.MarshalString("DeleteCreditResponse")
 		case "success":
 			out.Values[i] = ec._DeleteCreditResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteCreditTariffResponseImplementors = []string{"DeleteCreditTariffResponse"}
+
+func (ec *executionContext) _DeleteCreditTariffResponse(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteCreditTariffResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteCreditTariffResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteCreditTariffResponse")
+		case "status":
+			out.Values[i] = ec._DeleteCreditTariffResponse_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -6149,6 +7560,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createCreditTariff":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createCreditTariff(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateCreditTariff":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateCreditTariff(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteCreditTariff":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteCreditTariff(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6201,9 +7633,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_GetUsers(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
 				return res
 			}
 
@@ -6245,9 +7674,44 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getCredits(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "GetCreditTariffByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_GetCreditTariffByID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "GetCreditTariffs":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_GetCreditTariffs(ctx, field)
 				return res
 			}
 
@@ -6345,6 +7809,45 @@ func (ec *executionContext) _UpdateCreditResponse(ctx context.Context, sel ast.S
 			}
 		case "credit":
 			out.Values[i] = ec._UpdateCreditResponse_credit(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateCreditTariffResponseImplementors = []string{"UpdateCreditTariffResponse"}
+
+func (ec *executionContext) _UpdateCreditTariffResponse(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateCreditTariffResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateCreditTariffResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateCreditTariffResponse")
+		case "status":
+			out.Values[i] = ec._UpdateCreditTariffResponse_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6861,6 +8364,20 @@ func (ec *executionContext) marshalNCreateCreditResponse2ᚖgatewayᚋinternal�
 	return ec._CreateCreditResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNCreateCreditTariffResponse2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreateCreditTariffResponse(ctx context.Context, sel ast.SelectionSet, v model.CreateCreditTariffResponse) graphql.Marshaler {
+	return ec._CreateCreditTariffResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateCreditTariffResponse2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreateCreditTariffResponse(ctx context.Context, sel ast.SelectionSet, v *model.CreateCreditTariffResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateCreditTariffResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateUserInput2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreateUserInput(ctx context.Context, v interface{}) (model.CreateUserInput, error) {
 	res, err := ec.unmarshalInputCreateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6880,58 +8397,9 @@ func (ec *executionContext) marshalNCreateUserResponse2ᚖgatewayᚋinternalᚋa
 	return ec._CreateUserResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCredit2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Credit) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNCredit2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCredit(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNCredit2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCredit(ctx context.Context, sel ast.SelectionSet, v *model.Credit) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Credit(ctx, sel, v)
+func (ec *executionContext) unmarshalNCreditTariffInput2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditTariffInput(ctx context.Context, v interface{}) (model.CreditTariffInput, error) {
+	res, err := ec.unmarshalInputCreditTariffInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNDeleteCreditResponse2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐDeleteCreditResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteCreditResponse) graphql.Marshaler {
@@ -6946,6 +8414,20 @@ func (ec *executionContext) marshalNDeleteCreditResponse2ᚖgatewayᚋinternal�
 		return graphql.Null
 	}
 	return ec._DeleteCreditResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeleteCreditTariffResponse2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐDeleteCreditTariffResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteCreditTariffResponse) graphql.Marshaler {
+	return ec._DeleteCreditTariffResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteCreditTariffResponse2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐDeleteCreditTariffResponse(ctx context.Context, sel ast.SelectionSet, v *model.DeleteCreditTariffResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteCreditTariffResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDeleteUserResponse2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐDeleteUserResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteUserResponse) graphql.Marshaler {
@@ -6985,6 +8467,21 @@ func (ec *executionContext) unmarshalNGender2gatewayᚋinternalᚋapiᚋgraphᚋ
 
 func (ec *executionContext) marshalNGender2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐGender(ctx context.Context, sel ast.SelectionSet, v model.Gender) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalID(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
@@ -7104,6 +8601,20 @@ func (ec *executionContext) marshalNUpdateCreditResponse2ᚖgatewayᚋinternal�
 	return ec._UpdateCreditResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNUpdateCreditTariffResponse2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUpdateCreditTariffResponse(ctx context.Context, sel ast.SelectionSet, v model.UpdateCreditTariffResponse) graphql.Marshaler {
+	return ec._UpdateCreditTariffResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateCreditTariffResponse2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUpdateCreditTariffResponse(ctx context.Context, sel ast.SelectionSet, v *model.UpdateCreditTariffResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateCreditTariffResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNUpdateUserRequest2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUpdateUserRequest(ctx context.Context, v interface{}) (model.UpdateUserRequest, error) {
 	res, err := ec.unmarshalInputUpdateUserRequest(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7125,50 +8636,6 @@ func (ec *executionContext) marshalNUpdateUserResponse2ᚖgatewayᚋinternalᚋa
 
 func (ec *executionContext) marshalNUser2gatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNUser2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNUser2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) marshalNUser2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
@@ -7480,11 +8947,100 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) marshalOCredit2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCredit(ctx context.Context, sel ast.SelectionSet, v []*model.Credit) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCredit2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCredit(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
 func (ec *executionContext) marshalOCredit2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCredit(ctx context.Context, sel ast.SelectionSet, v *model.Credit) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Credit(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCreditTariff2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditTariff(ctx context.Context, sel ast.SelectionSet, v []*model.CreditTariff) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCreditTariff2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditTariff(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOCreditTariff2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditTariff(ctx context.Context, sel ast.SelectionSet, v *model.CreditTariff) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CreditTariff(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
@@ -7565,6 +9121,54 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	}
 	res := graphql.MarshalTime(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOUser2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOUser2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOUser2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._User(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

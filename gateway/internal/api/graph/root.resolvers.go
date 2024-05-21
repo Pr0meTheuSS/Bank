@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	auth "gateway/internal"
 	"gateway/internal/api/graph/model"
 	"gateway/internal/models"
@@ -176,6 +177,73 @@ func (r *mutationResolver) DeleteCredit(ctx context.Context, creditID int) (*mod
 	}, nil
 }
 
+// CreateCreditTariff is the resolver for the createCreditTariff field.
+func (r *mutationResolver) CreateCreditTariff(ctx context.Context, input model.CreditTariffInput) (*model.CreateCreditTariffResponse, error) {
+	log.Printf("resolver: CreateCreditTariff invoked")
+	tariff := &models.Tariff{
+		Name:            input.Name,
+		MinAmount:       input.MinAmount,
+		MaxAmount:       input.MaxAmount,
+		MinInterestRate: input.MinInterestRate,
+		MaxInterestRate: input.MaxInterestRate,
+		PaymentType:     models.PaymentType(input.PaymentType),
+		MinTermMonth:    uint(input.MinTermMonth),
+		MaxTermMonth:    uint(input.MaxTermMonth),
+	}
+	if input.Description != nil {
+		tariff.Description = *input.Description
+	}
+
+	err := r.tariffService.Create(ctx, nil, tariff)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.CreateCreditTariffResponse{
+		Status: 200,
+	}, nil
+}
+
+// UpdateCreditTariff is the resolver for the updateCreditTariff field.
+func (r *mutationResolver) UpdateCreditTariff(ctx context.Context, id int, input model.CreditTariffInput) (*model.UpdateCreditTariffResponse, error) {
+	tariff := &models.Tariff{
+		ID:              uint(id),
+		Name:            input.Name,
+		MinAmount:       input.MinAmount,
+		MaxAmount:       input.MaxAmount,
+		MinInterestRate: input.MinInterestRate,
+		MaxInterestRate: input.MaxInterestRate,
+		PaymentType:     models.PaymentType(input.PaymentType),
+		MinTermMonth:    uint(input.MinTermMonth),
+		MaxTermMonth:    uint(input.MaxTermMonth),
+	}
+
+	if input.Description != nil {
+		tariff.Description = *input.Description
+	}
+
+	err := r.tariffService.Update(ctx, nil, tariff)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.UpdateCreditTariffResponse{
+		Status: 200,
+	}, nil
+}
+
+// DeleteCreditTariff is the resolver for the deleteCreditTariff field.
+func (r *mutationResolver) DeleteCreditTariff(ctx context.Context, id int) (*model.DeleteCreditTariffResponse, error) {
+	err := r.tariffService.Delete(ctx, nil, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.DeleteCreditTariffResponse{
+		Status: 200,
+	}, nil
+}
+
 // GetUsers is the resolver for the GetUsers field.
 func (r *queryResolver) GetUsers(ctx context.Context, limit *int, offset *int) ([]*model.User, error) {
 	// authData := ctx.Value("auth")
@@ -229,6 +297,50 @@ func (r *queryResolver) GetCredits(ctx context.Context, limit *int, offset *int)
 	}
 
 	return MapCreditsToDTO(credits), nil
+}
+
+// GetCreditTariffByID is the resolver for the getCreditTariffByID field.
+func (r *queryResolver) GetCreditTariffByID(ctx context.Context, id string) (*model.CreditTariff, error) {
+	panic(fmt.Errorf("not implemented: GetCreditTariffByID - getCreditTariffByID"))
+}
+
+// GetCreditTariffs is the resolver for the getCreditTariffs field.
+func (r *queryResolver) GetCreditTariffs(ctx context.Context, limit *int, offset *int) ([]*model.CreditTariff, error) {
+	// Установим значения по умолчанию для limit и offset, если они не указаны
+	defaultLimit := 10
+	defaultOffset := 0
+
+	if limit == nil {
+		limit = &defaultLimit
+	}
+	if offset == nil {
+		offset = &defaultOffset
+	}
+
+	// Используем сервис для получения списка тарифов
+	tariffs, err := r.tariffService.GetTariffs(ctx, *limit, *offset)
+	if err != nil {
+		return nil, err
+	}
+
+	// Преобразуем тарифы из модели сервиса в модель GraphQL
+	var result []*model.CreditTariff
+	for _, t := range tariffs {
+		result = append(result, &model.CreditTariff{
+			ID:              int(t.ID),
+			Name:            t.Name,
+			MinAmount:       t.MinAmount,
+			MaxAmount:       t.MaxAmount,
+			MinInterestRate: t.MinInterestRate,
+			MaxInterestRate: t.MaxInterestRate,
+			PaymentType:     model.PaymentType(t.PaymentType),
+			MinTermMonth:    int(t.MinTermMonth),
+			MaxTermMonth:    int(t.MaxTermMonth),
+			Description:     &t.Description,
+		})
+	}
+
+	return result, nil
 }
 
 // Mutation returns MutationResolver implementation.
