@@ -1,0 +1,133 @@
+"""
+User types and enums
+==================================================
+"""
+type User {
+  ID: Int!
+
+  first_name: String!
+  second_name: String!
+  last_name: String!
+
+  email: String!
+  password: String!
+
+  passport_data: String!
+  birth_date: String!
+  gender: Gender!
+
+  role: UserRole!
+  status: UserStatus!
+  is_blocked: Boolean!
+}
+
+input CreateUserInput {
+  first_name: String!
+  second_name: String!
+  last_name: String!
+
+  email: String!
+  password: String!
+
+  passport_data: String!
+  birth_date: String!
+  gender: Gender!
+
+  role: UserRole!
+  status: UserStatus!
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+enum UserRole {
+  ADMIN
+  EMPLOYEE
+  CLIENT
+}
+
+enum UserStatus {
+  PENDING
+  VERIFIED
+  DENIED
+}
+
+"""
+==================================================
+"""
+
+type LoginResponse {
+  user: User!
+  token: String!
+}
+
+input LoginRequest {
+  email: String!
+  password: String!
+}
+"""
+==================================================
+"""
+
+
+type RegistrationResponse {
+  status: Int!
+}
+
+input RegistrationRequest {
+  user_details: RegistrationUserInput!
+  password: String!
+}
+
+input RegistrationUserInput {
+  first_name: String!
+  second_name: String!
+  last_name: String!
+
+  email: String!
+  password: String!
+
+  passport_data: String!
+  birth_date: String!
+  gender: Gender!
+
+  role: UserRole!
+}
+
+
+
+
+input UpdateUserRequest {
+  ID: Int!
+  first_name: String!
+  second_name: String!
+  last_name: String!
+
+  email: String!
+  password: String!
+
+  passport_data: String!
+  birth_date: String!
+  gender: Gender!
+
+  is_blocked: Boolean!
+  role: UserRole!
+  status: UserStatus!
+}
+
+type UpdateUserResponse {
+  status: Int!
+}
+"""
+==========================================
+"""
+
+
+type DeleteUserResponse {
+  status: Int!
+}
+
+type CreateUserResponse {
+  status: Int!
+}

@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import './Header.css';
 
 const Header = () => {
@@ -10,16 +9,5 @@ const Header = () => {
     </div>
   );
 };
-
-
-const Title = styled.h1`
-  font-size: 2em;
-  margin-bottom: 10px;
-`;
-
-const Subtitle = styled.p`
-  font-size: 1.2em;
-  color: #666;
-`;
 
 export default Header;

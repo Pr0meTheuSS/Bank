@@ -1,52 +1,5 @@
 body {
   background: url('.././assets/handshake.jpg') no-repeat center 0 fixed;
-  overflow: hidden;
+  overflow: auto;
   background-size: 100vw 100vh;
-}
-
-/* .login-form {
-  border: 5px;
-  border-color: black;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: rgba(1, 1, 1, 0.5);
-  width: fit-content;
-  margin: 0 auto;
-} */
-
-
-button {
-  border-radius: 10px;
-
-  font-size: 24px;
-
-  width: auto;
-  height: auto;
-
-  padding: 10px;
-  margin: 10px;
-
-
-  /* Enter-button */
-  background: linear-gradient(180deg, #D9D9D9 25.87%, rgba(217, 217, 217, 0) 132.63%);
-  border-radius: 15px;
-}
-
-.link {
-  text-decoration: none;
-  font-size: 24px;
-  color: red;
-
-  /* Зарегистрироваться */
-
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 300;
-  font-size: 40px;
-  line-height: 58px;
-  display: flex;
-  align-items: center;
-  text-decoration-line: underline;
-
-  color: #CDCDCD;
 }
