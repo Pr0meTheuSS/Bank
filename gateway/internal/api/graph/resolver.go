@@ -2,8 +2,10 @@ package graph
 
 import (
 	creditrepository "gateway/internal/repositories/credit_repository"
+	tariffrepository "gateway/internal/repositories/tariff_repository"
 	userrepository "gateway/internal/repositories/user_repository"
 	creditservice "gateway/internal/services/credit_service"
+	tariffservice "gateway/internal/services/tariff_service"
 	userservice "gateway/internal/services/user_service"
 	"log"
 
@@ -18,7 +20,7 @@ import (
 type Resolver struct {
 	userService   userservice.UserService
 	creditService creditservice.CreditService
-	// tariffService
+	tariffService tariffservice.TariffService
 	// transactionService
 	// loanApplicationService
 }
@@ -39,5 +41,6 @@ func NewResolver() *Resolver {
 	return &Resolver{
 		userService:   userservice.NewUserService(userrepository.NewUserRepository(db)),
 		creditService: creditservice.NewCreditService(creditrepository.NewCreditRepository(db)),
+		tariffService: tariffservice.NewTariffService(tariffrepository.NewCreditTariffRepository(db)),
 	}
 }

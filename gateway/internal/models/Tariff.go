@@ -2,15 +2,20 @@ package models
 
 // Tariff представляет модель тарифа по кредиту
 type Tariff struct {
-	ID   uint
-	Name string // Название тарифа
+	ID uint
 
-	MinAmount float64 // Минимальная сумма кредита
-	MaxAmount float64 // Максимальная сумма кредита
+	Name string
 
-	MinDurationInMonth int // Минимальный срок кредита (в месяцах)
-	MaxDurationInMonth int // Максимальный срок кредита (в месяцах)
+	MinAmount float64
+	MaxAmount float64
 
 	MinInterestRate float64
 	MaxInterestRate float64
+
+	PaymentType PaymentType
+
+	MinTermMonth uint
+	MaxTermMonth uint
+
+	Description string
 }

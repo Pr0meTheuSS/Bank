@@ -29,6 +29,10 @@ type CreateCreditResponse struct {
 	Credit  *Credit `json:"credit,omitempty"`
 }
 
+type CreateCreditTariffResponse struct {
+	Status int `json:"status"`
+}
+
 type CreateUserInput struct {
 	FirstName    string     `json:"first_name"`
 	SecondName   string     `json:"second_name"`
@@ -62,8 +66,37 @@ type Credit struct {
 	EndDate        time.Time   `json:"endDate"`
 }
 
+type CreditTariff struct {
+	ID              int         `json:"id"`
+	Name            string      `json:"name"`
+	MinAmount       float64     `json:"minAmount"`
+	MaxAmount       float64     `json:"maxAmount"`
+	MinInterestRate float64     `json:"minInterestRate"`
+	MaxInterestRate float64     `json:"maxInterestRate"`
+	PaymentType     PaymentType `json:"paymentType"`
+	MinTermMonth    int         `json:"minTermMonth"`
+	MaxTermMonth    int         `json:"maxTermMonth"`
+	Description     *string     `json:"description,omitempty"`
+}
+
+type CreditTariffInput struct {
+	Name            string      `json:"name"`
+	MinAmount       float64     `json:"minAmount"`
+	MaxAmount       float64     `json:"maxAmount"`
+	MinInterestRate float64     `json:"minInterestRate"`
+	MaxInterestRate float64     `json:"maxInterestRate"`
+	PaymentType     PaymentType `json:"paymentType"`
+	MinTermMonth    int         `json:"minTermMonth"`
+	MaxTermMonth    int         `json:"maxTermMonth"`
+	Description     *string     `json:"description,omitempty"`
+}
+
 type DeleteCreditResponse struct {
 	Success bool `json:"success"`
+}
+
+type DeleteCreditTariffResponse struct {
+	Status int `json:"status"`
 }
 
 // ==========================================
@@ -129,6 +162,10 @@ type UpdateCreditRequest struct {
 type UpdateCreditResponse struct {
 	Success bool    `json:"success"`
 	Credit  *Credit `json:"credit,omitempty"`
+}
+
+type UpdateCreditTariffResponse struct {
+	Status int `json:"status"`
 }
 
 type UpdateUserRequest struct {

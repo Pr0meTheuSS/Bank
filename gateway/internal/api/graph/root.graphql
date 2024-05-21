@@ -2,14 +2,17 @@ type Query {
   """
   Return all users.
   """
-  GetUsers(limit: Int, offset: Int): [User!]!
+  GetUsers(limit: Int, offset: Int): [User]
   """
   Return user by email.
   """
   GetUserByEmail(email: String!): User!
 
 
-  getCredits(limit: Int, offset: Int): [Credit!]!
+  getCredits(limit: Int, offset: Int): [Credit]
+
+  GetCreditTariffByID(id: ID!): CreditTariff
+  GetCreditTariffs(limit: Int, offset: Int): [CreditTariff]
 }
 
 type Mutation {
@@ -53,4 +56,21 @@ type Mutation {
   Delete credit
   """
   deleteCredit(creditID: Int!): DeleteCreditResponse!
+
+
+
+  """
+  Create credit tariff
+  """
+  createCreditTariff(input: CreditTariffInput!): CreateCreditTariffResponse!
+
+  """
+  Update credit tariff
+  """
+  updateCreditTariff(id: Int!, input: CreditTariffInput!): UpdateCreditTariffResponse!
+
+  """
+  Delete credit tariff
+  """
+  deleteCreditTariff(id: Int!): DeleteCreditTariffResponse!
 }

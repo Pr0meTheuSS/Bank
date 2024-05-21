@@ -1,0 +1,43 @@
+type CreditTariff {
+  id: Int!
+
+  name: String!
+
+  minAmount: Float!
+  maxAmount: Float!
+
+  minInterestRate: Float!
+  maxInterestRate: Float!
+
+  paymentType: PaymentType!
+
+  minTermMonth: Int!
+  maxTermMonth: Int!
+
+  description: String
+}
+
+# Входные данные для создания/обновления тарифа
+input CreditTariffInput {
+  name: String!
+  minAmount: Float!
+  maxAmount: Float!
+  minInterestRate: Float!
+  maxInterestRate: Float!
+  paymentType: PaymentType!
+  minTermMonth: Int!
+  maxTermMonth: Int!
+  description: String
+}
+
+type CreateCreditTariffResponse {
+  status: Int!
+}
+
+type UpdateCreditTariffResponse {
+  status: Int!
+}
+
+type DeleteCreditTariffResponse {
+  status: Int!
+}

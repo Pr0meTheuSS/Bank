@@ -20,12 +20,10 @@ const CustomAppBar = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6">
-            Банк надёжник
+            Банк наёжник
           </Typography>
-          <Button color="inherit" component={Link} to="/profile">Профиль</Button>
           <Button color="inherit" component={Link} to="/users">Пользователи</Button>
           <Button color="inherit" component={Link} to="/credits">Кредиты</Button>
-          <Button color="inherit" component={Link} to="/credit-applications">Заявки на кредит</Button>
           <Button color="inherit" component={Link} to="/credit-tariffs">Кредитные тарифы</Button>
         </Toolbar>
       </AppBar>
