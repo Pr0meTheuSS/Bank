@@ -1,6 +1,7 @@
 package creditrepository
 
 import (
+	"gateway/internal/api/graph/model"
 	"gateway/internal/models"
 	userrepository "gateway/internal/repositories/user_repository"
 	"log"
@@ -53,7 +54,7 @@ type CreditRepository interface {
 	Update(id uint, credit *models.Credit) error
 	Delete(id uint) error
 
-	GetAll(limit int, offset int) ([]*models.Credit, error)
+	GetAll(limit int, offset int, filters *model.CreditFilters) ([]*models.Credit, error)
 	GetByID(id uint) (*models.Credit, error)
 	GetAllForUser(userID uint) ([]*models.Credit, error)
 }
@@ -108,18 +109,36 @@ func (r *creditRepositoryImpl) GetAllForUser(userID uint) ([]*models.Credit, err
 	return credits, nil
 }
 
-func (r *creditRepositoryImpl) GetAll(limit int, offset int) ([]*models.Credit, error) {
+func (r *creditRepositoryImpl) GetAll(limit int, offset int, filters *model.CreditFilters) ([]*models.Credit, error) {
 	var credits []*models.Credit
+	query := r.db
 
-	if limit == 0 {
-		err := r.db.Find(&credits).Error
-		if err != nil {
-			return nil, err
+	if filters != nil {
+		if filters.UserID != nil {
+			query = query.Where("user_id = ?", *filters.UserID)
 		}
-		return credits, nil
+		if filters.IsActive != nil {
+			query = query.Where("is_active = ?", *filters.IsActive)
+		}
+		if filters.MinAmount != nil {
+			query = query.Where("body >= ?", *filters.MinAmount)
+		}
+		if filters.MaxAmount != nil {
+			query = query.Where("body <= ?", *filters.MaxAmount)
+		}
+		if filters.StartDate != nil {
+			query = query.Where("start_date >= ?", *filters.StartDate)
+		}
+		if filters.EndDate != nil {
+			query = query.Where("end_date <= ?", *filters.EndDate)
+		}
 	}
 
-	err := r.db.Limit(limit).Offset(offset).Find(&credits).Error
+	if limit != 0 {
+		query = query.Limit(limit).Offset(offset)
+	}
+
+	err := query.Find(&credits).Error
 	if err != nil {
 		return nil, err
 	}

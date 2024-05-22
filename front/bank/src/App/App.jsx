@@ -7,15 +7,34 @@ import EditUserModal from '../UserFormModal/EditUserModal';
 import Users from '../Users/Users';
 import TariffsPage from '../Tariffs/Tariffs';
 import CreditsPage from '../Credits/Credits';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-
+import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 const App = () => {
 
-  // Создаем экземпляр клиента Apollo
-  const client = new ApolloClient({
-    uri: 'http://localhost:9091', // Замените на адрес вашего GraphQL-сервера
-    cache: new InMemoryCache()
+  const httpLink = createHttpLink({
+    uri: 'http://localhost:9091',
   });
+  
+  // Создайте middleware для добавления заголовка авторизации
+  const authLink = setContext((_, { headers }) => {
+    // Получите токен авторизации из хранилища (например, localStorage)
+    const token = localStorage.getItem('token');
+  
+    // Возвращаем новые заголовки
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : '',
+      }
+    };
+  });
+  
+  // Объедините authLink и httpLink
+  const client = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache(),
+  });
+  
   return (
     <ApolloProvider client={client}>
       <Router className='App'>

@@ -64,30 +64,31 @@ const Signin = () => {
 
     const onSubmit = () => {
         const registrationRequest = {
-            userDetails: {
+            user_details: {
                 first_name: getValues('first_name'),
                 second_name: getValues('second_name'),
                 last_name: getValues('last_name'),
                 email: getValues('email'),
-                passportData: getValues('passportData'),
+                passport_data: getValues('passport_data'),
                 birth_date: getValues('birth_date'),
                 gender: getValues('gender'),
                 role: getValues('role'),
+                password: getValues('password'),
             },
             password: getValues('password'),
         };
 
         registerUser({ variables: { registrationRequest } })
-        .then(response => {
-            console.log('Registration response:', response.data);
-            alert('Registration response:', response.data);
-            // Переход на страницу с сообщением о статусе регистрации
-            navigate('/', { state: { status: response.data.register.status } });
-        })
-        .catch(error => {
-            console.error('Registration error:', error);
-            // Обработка ошибки регистрации
-        });
+            .then(response => {
+                console.log('Registration response:', response.data);
+                alert('Registration response:', response.data);
+                // Переход на страницу с сообщением о статусе регистрации
+                navigate('/login', { state: { status: response.data.register.status } });
+            })
+            .catch(error => {
+                console.error('Registration error:', error);
+                // Обработка ошибки регистрации
+            });
     };
 
     return (
@@ -102,7 +103,7 @@ const Signin = () => {
                         <TextField label="Email" error={errors.userDetails?.email} helperText={errors.userDetails?.email && "Email обязателен"} {...register('email')} />
                         <TextField type="password" label="Пароль" error={errors.password} helperText={errors.password && "Пароль обязателен"} {...register('password')} />
                         <TextField type="password" label="Повторите пароль" error={errors.confirmPassword} helperText={errors.confirmPassword && "Подтверждение пароля обязательно"} {...register('confirmPassword')} />
-                        <TextField label="Паспортные данные" error={errors.userDetails?.passportData} helperText={errors.userDetails?.passportData && "Паспортные данные обязательны"} {...register('passportData')} />
+                        <TextField label="Паспортные данные" error={errors.userDetails?.passportData} helperText={errors.userDetails?.passportData && "Паспортные данные обязательны"} {...register('passport_data')} />
                         <TextField type="date" label="Дата рождения" InputLabelProps={{ shrink: true }} error={errors.userDetails?.birth_date} helperText={errors.userDetails?.birth_date && "Дата рождения обязательна"} {...register('birth_date')} />
                         <FormControl error={errors.userDetails?.gender} fullWidth>
                             <InputLabel>Пол</InputLabel>

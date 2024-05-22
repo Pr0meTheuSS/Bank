@@ -2,17 +2,20 @@ package creditservice
 
 import (
 	"context"
+	"errors"
+	auth "gateway/internal"
+	"gateway/internal/api/graph/model"
 	"gateway/internal/models"
 	creditrepository "gateway/internal/repositories/credit_repository"
 )
 
 type CreditService interface {
-	Create(ctx context.Context, credit *models.Credit) error
-	Delete(ctx context.Context, ID int) error
-	Update(ctx context.Context, credit *models.Credit) error
+	Create(ctx context.Context, auth *auth.AuthData, credit *models.Credit) error
+	Delete(ctx context.Context, auth *auth.AuthData, ID int) error
+	Update(ctx context.Context, auth *auth.AuthData, credit *models.Credit) error
 
-	GetCreditByUserID(ctx context.Context, userID int) ([]*models.Credit, error)
-	GetCredits(ctx context.Context, limit int, offset int) ([]*models.Credit, error)
+	GetCreditByUserID(ctx context.Context, auth *auth.AuthData, userID int) ([]*models.Credit, error)
+	GetCredits(ctx context.Context, auth *auth.AuthData, limit int, offset int, filters *model.CreditFilters) ([]*models.Credit, error)
 }
 
 type CreditServiceImpl struct {
@@ -25,22 +28,42 @@ func NewCreditService(creditRepo creditrepository.CreditRepository) CreditServic
 	}
 }
 
-func (s *CreditServiceImpl) Create(ctx context.Context, credit *models.Credit) error {
+func (s *CreditServiceImpl) Create(ctx context.Context, auth *auth.AuthData, credit *models.Credit) error {
+	if auth.Role != model.UserRoleAdmin && auth.UserId != int(credit.UserID) {
+		return errors.New("access denied")
+	}
+
 	return s.creditRepo.Create(credit)
 }
 
-func (s *CreditServiceImpl) Delete(ctx context.Context, ID int) error {
+func (s *CreditServiceImpl) Delete(ctx context.Context, auth *auth.AuthData, ID int) error {
+	if auth.Role != model.UserRoleAdmin {
+		return errors.New("access denied")
+	}
+
 	return s.creditRepo.Delete(uint(ID))
 }
 
-func (s *CreditServiceImpl) Update(ctx context.Context, credit *models.Credit) error {
+func (s *CreditServiceImpl) Update(ctx context.Context, auth *auth.AuthData, credit *models.Credit) error {
+	if auth.Role != model.UserRoleAdmin {
+		return errors.New("access denied")
+	}
+
 	return s.creditRepo.Update(uint(credit.ID), credit)
 }
 
-func (s *CreditServiceImpl) GetCreditByUserID(ctx context.Context, userID int) ([]*models.Credit, error) {
+func (s *CreditServiceImpl) GetCreditByUserID(ctx context.Context, auth *auth.AuthData, userID int) ([]*models.Credit, error) {
+	if auth.Role == model.UserRoleClient && auth.UserId != int(userID) {
+		return nil, errors.New("access denied")
+	}
+
 	return s.creditRepo.GetAllForUser(uint(userID))
 }
 
-func (s *CreditServiceImpl) GetCredits(ctx context.Context, limit int, offset int) ([]*models.Credit, error) {
-	return s.creditRepo.GetAll(limit, offset)
+func (s *CreditServiceImpl) GetCredits(ctx context.Context, auth *auth.AuthData, limit int, offset int, filters *model.CreditFilters) ([]*models.Credit, error) {
+	if auth.Role != model.UserRoleAdmin {
+		return nil, errors.New("access denied")
+	}
+
+	return s.creditRepo.GetAll(limit, offset, filters)
 }

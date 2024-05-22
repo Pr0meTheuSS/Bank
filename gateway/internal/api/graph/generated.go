@@ -124,7 +124,7 @@ type ComplexityRoot struct {
 	Query struct {
 		GetCreditTariffByID func(childComplexity int, id string) int
 		GetCreditTariffs    func(childComplexity int, limit *int, offset *int) int
-		GetCredits          func(childComplexity int, limit *int, offset *int) int
+		GetCredits          func(childComplexity int, limit *int, offset *int, filters *model.CreditFilters) int
 		GetUserByEmail      func(childComplexity int, email string) int
 		GetUsers            func(childComplexity int, limit *int, offset *int) int
 	}
@@ -178,7 +178,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	GetUsers(ctx context.Context, limit *int, offset *int) ([]*model.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*model.User, error)
-	GetCredits(ctx context.Context, limit *int, offset *int) ([]*model.Credit, error)
+	GetCredits(ctx context.Context, limit *int, offset *int, filters *model.CreditFilters) ([]*model.Credit, error)
 	GetCreditTariffByID(ctx context.Context, id string) (*model.CreditTariff, error)
 	GetCreditTariffs(ctx context.Context, limit *int, offset *int) ([]*model.CreditTariff, error)
 }
@@ -592,7 +592,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetCredits(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
+		return e.complexity.Query.GetCredits(childComplexity, args["limit"].(*int), args["offset"].(*int), args["filters"].(*model.CreditFilters)), true
 
 	case "Query.GetUserByEmail":
 		if e.complexity.Query.GetUserByEmail == nil {
@@ -747,6 +747,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateCreditRequest,
 		ec.unmarshalInputCreateUserInput,
+		ec.unmarshalInputCreditFilters,
 		ec.unmarshalInputCreditTariffInput,
 		ec.unmarshalInputLoginRequest,
 		ec.unmarshalInputRegistrationRequest,
@@ -1160,6 +1161,15 @@ func (ec *executionContext) field_Query_getCredits_args(ctx context.Context, raw
 		}
 	}
 	args["offset"] = arg1
+	var arg2 *model.CreditFilters
+	if tmp, ok := rawArgs["filters"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filters"))
+		arg2, err = ec.unmarshalOCreditFilters2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditFilters(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filters"] = arg2
 	return args, nil
 }
 
@@ -3485,7 +3495,7 @@ func (ec *executionContext) _Query_getCredits(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetCredits(rctx, fc.Args["limit"].(*int), fc.Args["offset"].(*int))
+		return ec.resolvers.Query().GetCredits(rctx, fc.Args["limit"].(*int), fc.Args["offset"].(*int), fc.Args["filters"].(*model.CreditFilters))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6568,6 +6578,68 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreditFilters(ctx context.Context, obj interface{}) (model.CreditFilters, error) {
+	var it model.CreditFilters
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userID", "isActive", "minAmount", "maxAmount", "startDate", "endDate"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "isActive":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isActive"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsActive = data
+		case "minAmount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("minAmount"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MinAmount = data
+		case "maxAmount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxAmount"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxAmount = data
+		case "startDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startDate"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StartDate = data
+		case "endDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endDate"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EndDate = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreditTariffInput(ctx context.Context, obj interface{}) (model.CreditTariffInput, error) {
 	var it model.CreditTariffInput
 	asMap := map[string]interface{}{}
@@ -8995,6 +9067,14 @@ func (ec *executionContext) marshalOCredit2ᚖgatewayᚋinternalᚋapiᚋgraph�
 	return ec._Credit(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOCreditFilters2ᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditFilters(ctx context.Context, v interface{}) (*model.CreditFilters, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCreditFilters(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalOCreditTariff2ᚕᚖgatewayᚋinternalᚋapiᚋgraphᚋmodelᚐCreditTariff(ctx context.Context, sel ast.SelectionSet, v []*model.CreditTariff) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -9057,6 +9137,22 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	}
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalID(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {

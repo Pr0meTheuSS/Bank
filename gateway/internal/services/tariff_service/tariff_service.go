@@ -2,8 +2,10 @@ package tariffservice
 
 import (
 	"context"
+	"errors"
 
 	auth "gateway/internal"
+	"gateway/internal/api/graph/model"
 	"gateway/internal/models"
 	tariffrepository "gateway/internal/repositories/tariff_repository"
 )
@@ -27,7 +29,11 @@ func NewTariffService(repo tariffrepository.CreditTariffRepository) *TariffServi
 }
 
 // Create создаёт новый кредитный тариф
-func (s *TariffServiceImpl) Create(ctx context.Context, authData *auth.AuthData, tariff *models.Tariff) error {
+func (s *TariffServiceImpl) Create(ctx context.Context, auth *auth.AuthData, tariff *models.Tariff) error {
+	if auth.Role != model.UserRoleAdmin && auth.Role != model.UserRoleEmployee {
+		return errors.New("access denied")
+	}
+
 	creditTariff := &tariffrepository.CreditTariff{
 		Name:            tariff.Name,
 		MinAmount:       tariff.MinAmount,
@@ -43,7 +49,11 @@ func (s *TariffServiceImpl) Create(ctx context.Context, authData *auth.AuthData,
 }
 
 // Update обновляет существующий кредитный тариф
-func (s *TariffServiceImpl) Update(ctx context.Context, authData *auth.AuthData, tariff *models.Tariff) error {
+func (s *TariffServiceImpl) Update(ctx context.Context, auth *auth.AuthData, tariff *models.Tariff) error {
+	if auth.Role != model.UserRoleAdmin && auth.Role != model.UserRoleEmployee {
+		return errors.New("access denied")
+	}
+
 	existingTariff, err := s.repository.FindByID(uint(tariff.ID))
 	if err != nil {
 		return err
@@ -63,7 +73,11 @@ func (s *TariffServiceImpl) Update(ctx context.Context, authData *auth.AuthData,
 }
 
 // Delete удаляет кредитный тариф по ID
-func (s *TariffServiceImpl) Delete(ctx context.Context, authData *auth.AuthData, ID int) error {
+func (s *TariffServiceImpl) Delete(ctx context.Context, auth *auth.AuthData, ID int) error {
+	if auth.Role != model.UserRoleAdmin && auth.Role != model.UserRoleEmployee {
+		return errors.New("access denied")
+	}
+
 	return s.repository.Delete(uint(ID))
 }
 

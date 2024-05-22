@@ -76,3 +76,12 @@ input UpdateCreditRequest {
 type DeleteCreditResponse {
   success: Boolean!
 }
+
+input CreditFilters {
+  userID: ID
+  isActive: Boolean
+  minAmount: Float
+  maxAmount: Float
+  startDate: String
+  endDate: String
+}

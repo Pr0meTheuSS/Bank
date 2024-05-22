@@ -9,9 +9,10 @@ type Query {
   GetUserByEmail(email: String!): User!
 
 
-  getCredits(limit: Int, offset: Int): [Credit]
+  getCredits(limit: Int, offset: Int, filters: CreditFilters): [Credit]
 
   GetCreditTariffByID(id: ID!): CreditTariff
+
   GetCreditTariffs(limit: Int, offset: Int): [CreditTariff]
 }
 

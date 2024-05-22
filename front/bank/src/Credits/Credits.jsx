@@ -1,32 +1,32 @@
-import { React, useState } from 'react';
-import { Container, Typography, Button, Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, MenuItem, Typography, Button, Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper, TextField } from '@mui/material';
 import { useQuery, useMutation } from '@apollo/client';
 import CreateCreditModal from '../CreditModal/CreateCreditModal';
 import EditCreditModal from '../CreditModal/UpdateCreditModal';
 import CustomAppBar from '../AppBar/AppBar';
-import { CREATE_CREDIT, UPDATE_CREDIT , DELETE_CREDIT} from './mutations';
+import { CREATE_CREDIT, UPDATE_CREDIT, DELETE_CREDIT } from './mutations';
 import { GET_CREDITS } from './queries';
-
 import { format } from 'date-fns';
 
 const CreditsPage = () => {
     const pageCreditsLimit = 10;
     const [pageCreditsOffset, setPageCreditsOffset] = useState(0);
+    const [filters, setFilters] = useState({});
 
     const [isNewCreditModalOpen, setNewCreditModalOpen] = useState(false);
     const [isEditCreditModalOpen, setEditCreditModalOpen] = useState(false);
     const [selectedCredit, setSelectedCredit] = useState({});
 
     const [createCreditMutation] = useMutation(CREATE_CREDIT, {
-        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset } }],
+        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters } }],
     });
 
     const [updateCreditMutation] = useMutation(UPDATE_CREDIT, {
-        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset } }],
+        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters } }],
     });
 
     const [deleteCreditMutation] = useMutation(DELETE_CREDIT, {
-        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset } }],
+        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters } }],
     });
 
     const createCredit = () => {
@@ -37,6 +37,13 @@ const CreditsPage = () => {
         setSelectedCredit(credit);
         setEditCreditModalOpen(true);
     }
+
+    useEffect(() => {
+        setFilters({
+            ...filters,
+        });
+    }, [filters]);
+
     const deleteCredit = (creditID) => {
         deleteCreditMutation({ variables: { creditID } })
             .then(response => {
@@ -67,12 +74,10 @@ const CreditsPage = () => {
     }
 
     const onUpdateCredit = (credit) => {
-        // Переформатируем даты в требуемый формат перед отправкой
         const formattedStartDate = format(new Date(credit.startDate), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         const formattedEndDate = format(new Date(credit.endDate), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         console.log(credit);
 
-        // Создаем обновленный объект кредита с новыми отформатированными датами
         const updatedCredit = {
             ...credit,
             startDate: formattedStartDate,
@@ -93,8 +98,36 @@ const CreditsPage = () => {
     }
 
     const { loading, error, data } = useQuery(GET_CREDITS, {
-        variables: { limit: pageCreditsLimit, offset: pageCreditsOffset }
+        variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters }
     });
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prevFilters => {
+            if (value === '') {
+                const { [name]: _, ...rest } = prevFilters;
+                return rest;
+            }
+            return {
+                ...prevFilters,
+                [name]: value
+            };
+        });
+    };
+
+    const applyFilters = () => {
+        setPageCreditsOffset(0);
+    };
+
+    const handleNextPage = () => {
+        setPageCreditsOffset(pageCreditsOffset + pageCreditsLimit);
+    };
+
+    const handlePreviousPage = () => {
+        if (pageCreditsOffset > 0) {
+            setPageCreditsOffset(pageCreditsOffset - pageCreditsLimit);
+        }
+    };
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error.message}</p>;
@@ -103,8 +136,64 @@ const CreditsPage = () => {
         <>
             <CustomAppBar />
             <Container>
-                <Typography variant="h4">Кредиты</Typography>
+                <Typography variant="h4" style={{ color: 'white' }}>Кредиты</Typography>
                 <Button variant="contained" color="primary" onClick={createCredit} style={{ marginBottom: '10px' }}>Добавить кредит</Button>
+                
+                <Paper style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', color: 'white' }}>
+                    <TextField
+                        label="ID пользователя"
+                        name="userID"
+                        value={filters.userID}
+                        onChange={handleFilterChange}
+                        style={{ marginBottom: '10px' }}
+                    />
+                    <TextField
+                        label="Активен"
+                        name="isActive"
+                        value={filters.isActive}
+                        onChange={handleFilterChange}
+                        style={{ marginBottom: '10px' }}
+                        select
+                    >
+                        <MenuItem value="">Все</MenuItem>
+                        <MenuItem value={true}>Да</MenuItem>
+                        <MenuItem value={false}>Нет</MenuItem>
+                    </TextField>
+                    <TextField
+                        label="Минимальная сумма"
+                        name="minAmount"
+                        value={filters.minAmount}
+                        onChange={handleFilterChange}
+                        type="number"
+                        style={{ marginBottom: '10px' }}
+                    />
+                    <TextField
+                        label="Максимальная сумма"
+                        name="maxAmount"
+                        value={filters.maxAmount}
+                        onChange={handleFilterChange}
+                        type="number"
+                        style={{ marginBottom: '10px' }}
+                    />
+                    <TextField
+                        label="Дата начала"
+                        name="startDate"
+                        value={filters.startDate}
+                        onChange={handleFilterChange}
+                        type="date"
+                        style={{ marginBottom: '10px' }}
+                    />
+                    <TextField
+                        label="Дата окончания"
+                        name="endDate"
+                        value={filters.endDate}
+                        onChange={handleFilterChange}
+                        type="date"
+                        style={{ marginBottom: '10px' }}
+                    />
+                    <Button variant="contained" color="primary" onClick={applyFilters}>Применить фильтры</Button>
+                </Paper>
+
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -150,6 +239,10 @@ const CreditsPage = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
+                    <Button variant="contained" color="primary" onClick={handlePreviousPage} disabled={pageCreditsOffset === 0}>Назад</Button>
+                    <Button variant="contained" color="primary" onClick={handleNextPage}>Вперед</Button>
+                </div>
                 <CreateCreditModal
                     open={isNewCreditModalOpen}
                     onClose={() => setNewCreditModalOpen(false)}
