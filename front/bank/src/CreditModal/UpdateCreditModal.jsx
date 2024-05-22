@@ -35,10 +35,10 @@ const EditCreditModal = ({ open, onClose, credit = {}, onUpdateCredit }) => {
         const newErrors = {};
         if (!formData.userID) newErrors.userID = 'ID пользователя обязательно';
         if (!formData.applicationID) newErrors.applicationID = 'ID кредитной заявки обязательно';
-        if (!formData.body) newErrors.body = 'Сумма обязательна';
-        if (!formData.percents) newErrors.percents = 'Проценты обязательны';
-        if (!formData.fine) newErrors.fine = 'Штрафы обязательны';
-        if (!formData.commission) newErrors.commission = 'Комиссия обязательна';
+        if (!formData.body === undefined) newErrors.body = 'Сумма обязательна';
+        if (formData.percents === undefined) newErrors.percents = 'Проценты обязательны';
+        if (formData.fine === undefined) newErrors.fine = 'Штрафы обязательны';
+        if (formData.commission === undefined) newErrors.commission = 'Комиссия обязательна';
         if (formData.isActive === undefined) newErrors.isActive = 'Активен обязателен';
         if (!formData.paymentType) newErrors.paymentType = 'Тип платежа обязателен';
         if (!formData.interestRate) newErrors.interestRate = 'Процентная ставка обязательна';

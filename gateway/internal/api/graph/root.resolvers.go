@@ -47,10 +47,10 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginRequest) 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.CreateUserResponse, error) {
 	log.Printf("resolver: CreateUser invoked")
-	// authData := ctx.Value("auth")
-	// if authData == nil {
-	// 	return nil, errors.New("not authorized")
-	// }
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
 
 	user := &models.User{
 		ID:           0,
@@ -67,7 +67,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 		Status:       models.UserStatus(input.Status),
 	}
 
-	_, err := r.userService.Create(ctx, nil, user)
+	_, err := r.userService.Create(ctx, authData.(*auth.AuthData), user)
 	if err != nil {
 		return nil, err
 	}
@@ -80,14 +80,13 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserRequest) (*model.UpdateUserResponse, error) {
 	log.Printf("resolver: UpdateUser invoked")
-	// authData := ctx.Value("auth")
-	// if authData == nil {
-	// 	return nil, errors.New("not authorized")
-	// }
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
 	log.Println(input)
 	user := MapUpdateUserRequestToUser(input)
-	// _, err := r.userService.Update(ctx, authData.(*auth.AuthData), input.ID, &user)
-	_, err := r.userService.Update(ctx, nil, input.ID, &user)
+	_, err := r.userService.Update(ctx, authData.(*auth.AuthData), input.ID, &user)
 
 	if err != nil {
 		return nil, err
@@ -100,19 +99,23 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUse
 
 // DeleteUser is the resolver for the deleteUser field.
 func (r *mutationResolver) DeleteUser(ctx context.Context, userID int) (*model.DeleteUserResponse, error) {
-	// authData := ctx.Value("auth")
-	// if authData == nil {
-	// 	return nil, errors.New("not authorized")
-	// }
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
 
 	return &model.DeleteUserResponse{
 		Status: 0,
-	}, r.userService.Delete(ctx, nil, userID)
+	}, r.userService.Delete(ctx, authData.(*auth.AuthData), userID)
 }
 
 // CreateCredit is the resolver for the createCredit field.
 func (r *mutationResolver) CreateCredit(ctx context.Context, input model.CreateCreditRequest) (*model.CreateCreditResponse, error) {
 	log.Printf("resolver: CreateCredit invoked")
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
 
 	credit := &models.Credit{
 		UserID:         uint64(input.UserID),
@@ -128,7 +131,7 @@ func (r *mutationResolver) CreateCredit(ctx context.Context, input model.CreateC
 		StartDate:      input.StartDate,
 		EndDate:        input.EndDate,
 	}
-	if err := r.creditService.Create(ctx, credit); err != nil {
+	if err := r.creditService.Create(ctx, authData.(*auth.AuthData), credit); err != nil {
 		return nil, err
 	}
 
@@ -141,6 +144,11 @@ func (r *mutationResolver) CreateCredit(ctx context.Context, input model.CreateC
 // UpdateCredit is the resolver for the updateCredit field.
 func (r *mutationResolver) UpdateCredit(ctx context.Context, input model.UpdateCreditRequest) (*model.UpdateCreditResponse, error) {
 	log.Printf("resolver: UpdateCredit invoked")
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
+
 	credit := &models.Credit{
 		ID:             uint64(input.ID),
 		UserID:         uint64(*input.UserID),
@@ -156,7 +164,7 @@ func (r *mutationResolver) UpdateCredit(ctx context.Context, input model.UpdateC
 		StartDate:      *input.StartDate,
 		EndDate:        *input.EndDate,
 	}
-	if err := r.creditService.Update(ctx, credit); err != nil {
+	if err := r.creditService.Update(ctx, authData.(*auth.AuthData), credit); err != nil {
 		return nil, err
 	}
 
@@ -168,7 +176,12 @@ func (r *mutationResolver) UpdateCredit(ctx context.Context, input model.UpdateC
 // DeleteCredit is the resolver for the deleteCredit field.
 func (r *mutationResolver) DeleteCredit(ctx context.Context, creditID int) (*model.DeleteCreditResponse, error) {
 	log.Printf("resolver: UpdateCredit invoked")
-	if err := r.creditService.Delete(ctx, creditID); err != nil {
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
+
+	if err := r.creditService.Delete(ctx, authData.(*auth.AuthData), creditID); err != nil {
 		return nil, err
 	}
 
@@ -180,6 +193,11 @@ func (r *mutationResolver) DeleteCredit(ctx context.Context, creditID int) (*mod
 // CreateCreditTariff is the resolver for the createCreditTariff field.
 func (r *mutationResolver) CreateCreditTariff(ctx context.Context, input model.CreditTariffInput) (*model.CreateCreditTariffResponse, error) {
 	log.Printf("resolver: CreateCreditTariff invoked")
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
+
 	tariff := &models.Tariff{
 		Name:            input.Name,
 		MinAmount:       input.MinAmount,
@@ -194,7 +212,7 @@ func (r *mutationResolver) CreateCreditTariff(ctx context.Context, input model.C
 		tariff.Description = *input.Description
 	}
 
-	err := r.tariffService.Create(ctx, nil, tariff)
+	err := r.tariffService.Create(ctx, authData.(*auth.AuthData), tariff)
 	if err != nil {
 		return nil, err
 	}
@@ -206,6 +224,11 @@ func (r *mutationResolver) CreateCreditTariff(ctx context.Context, input model.C
 
 // UpdateCreditTariff is the resolver for the updateCreditTariff field.
 func (r *mutationResolver) UpdateCreditTariff(ctx context.Context, id int, input model.CreditTariffInput) (*model.UpdateCreditTariffResponse, error) {
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
+
 	tariff := &models.Tariff{
 		ID:              uint(id),
 		Name:            input.Name,
@@ -222,7 +245,7 @@ func (r *mutationResolver) UpdateCreditTariff(ctx context.Context, id int, input
 		tariff.Description = *input.Description
 	}
 
-	err := r.tariffService.Update(ctx, nil, tariff)
+	err := r.tariffService.Update(ctx, authData.(*auth.AuthData), tariff)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +257,12 @@ func (r *mutationResolver) UpdateCreditTariff(ctx context.Context, id int, input
 
 // DeleteCreditTariff is the resolver for the deleteCreditTariff field.
 func (r *mutationResolver) DeleteCreditTariff(ctx context.Context, id int) (*model.DeleteCreditTariffResponse, error) {
-	err := r.tariffService.Delete(ctx, nil, id)
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
+
+	err := r.tariffService.Delete(ctx, authData.(*auth.AuthData), id)
 	if err != nil {
 		return nil, err
 	}
@@ -246,10 +274,10 @@ func (r *mutationResolver) DeleteCreditTariff(ctx context.Context, id int) (*mod
 
 // GetUsers is the resolver for the GetUsers field.
 func (r *queryResolver) GetUsers(ctx context.Context, limit *int, offset *int) ([]*model.User, error) {
-	// authData := ctx.Value("auth")
-	// if authData == nil {
-	// 	return nil, errors.New("not authorized")
-	// }
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
 	lim := 0
 	off := 0
 	if limit != nil {
@@ -261,7 +289,7 @@ func (r *queryResolver) GetUsers(ctx context.Context, limit *int, offset *int) (
 
 	// Преобразуем модели базы данных в модели GraphQL
 	//	graphqlUsers, err := r.userService.GetUsers(ctx, authData.(*auth.AuthData), lim, off)
-	graphqlUsers, err := r.userService.GetUsers(ctx, nil, lim, off)
+	graphqlUsers, err := r.userService.GetUsers(ctx, authData.(*auth.AuthData), lim, off)
 	return MapUsersToDTO(graphqlUsers), err
 }
 
@@ -280,8 +308,13 @@ func (r *queryResolver) GetUserByEmail(ctx context.Context, email string) (*mode
 }
 
 // GetCredits is the resolver for the getCredits field.
-func (r *queryResolver) GetCredits(ctx context.Context, limit *int, offset *int) ([]*model.Credit, error) {
+func (r *queryResolver) GetCredits(ctx context.Context, limit *int, offset *int, filters *model.CreditFilters) ([]*model.Credit, error) {
 	log.Printf("resolver: GetCredits invoked")
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
+
 	creditsLimit := 0
 	creditsOffset := 0
 	if limit != nil {
@@ -291,7 +324,7 @@ func (r *queryResolver) GetCredits(ctx context.Context, limit *int, offset *int)
 		creditsOffset = *offset
 	}
 
-	credits, err := r.creditService.GetCredits(ctx, creditsLimit, creditsOffset)
+	credits, err := r.creditService.GetCredits(ctx, authData.(*auth.AuthData), creditsLimit, creditsOffset, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -306,6 +339,11 @@ func (r *queryResolver) GetCreditTariffByID(ctx context.Context, id string) (*mo
 
 // GetCreditTariffs is the resolver for the getCreditTariffs field.
 func (r *queryResolver) GetCreditTariffs(ctx context.Context, limit *int, offset *int) ([]*model.CreditTariff, error) {
+	authData := ctx.Value("auth")
+	if authData == nil {
+		return nil, errors.New("not authorized")
+	}
+
 	// Установим значения по умолчанию для limit и offset, если они не указаны
 	defaultLimit := 10
 	defaultOffset := 0

@@ -18,6 +18,7 @@ type AuthData struct {
 	UserId    int
 	UserEmail string
 	Expired   time.Time
+	Role      model.UserRole
 }
 
 func GenerateJWT(userID int, email string, role model.UserRole) (string, error) {

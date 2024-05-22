@@ -66,6 +66,15 @@ type Credit struct {
 	EndDate        time.Time   `json:"endDate"`
 }
 
+type CreditFilters struct {
+	UserID    *string  `json:"userID,omitempty"`
+	IsActive  *bool    `json:"isActive,omitempty"`
+	MinAmount *float64 `json:"minAmount,omitempty"`
+	MaxAmount *float64 `json:"maxAmount,omitempty"`
+	StartDate *string  `json:"startDate,omitempty"`
+	EndDate   *string  `json:"endDate,omitempty"`
+}
+
 type CreditTariff struct {
 	ID              int         `json:"id"`
 	Name            string      `json:"name"`

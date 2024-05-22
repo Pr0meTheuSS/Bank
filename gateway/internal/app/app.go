@@ -4,6 +4,7 @@ import (
 	"context"
 	auth "gateway/internal"
 	"gateway/internal/api/graph"
+	"gateway/internal/api/graph/model"
 	"gateway/internal/config"
 	"log"
 	"net/http"
@@ -59,7 +60,6 @@ func NewAuthMiddleware() func(http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			jwt := r.Header.Get("Authorization")
 			if jwt == "" {
-				log.Println("jwt is empty")
 				h.ServeHTTP(w, r)
 				return
 			}
@@ -78,6 +78,8 @@ func NewAuthMiddleware() func(http.Handler) http.Handler {
 			userId, _ := claims["userID"].(float64)
 			userEmail, _ := claims["email"].(string)
 			expired := claims["exp"].(float64)
+			roleStr := claims["role"].(string)
+			role := model.UserRole(roleStr)
 
 			expiredTime := time.Unix(int64(expired), 0)
 
@@ -86,6 +88,7 @@ func NewAuthMiddleware() func(http.Handler) http.Handler {
 				UserId:    int(userId),
 				UserEmail: userEmail,
 				Expired:   expiredTime,
+				Role:      role,
 			}
 
 			r = r.WithContext(context.WithValue(r.Context(), "auth", &access))
