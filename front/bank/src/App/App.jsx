@@ -9,8 +9,10 @@ import TariffsPage from '../Tariffs/Tariffs';
 import CreditsPage from '../Credits/Credits';
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import AdminQuery from '../AdminQuery/AdminQuery';
+import ForgotPassword from '../ForgotPassword/ForgotPassword';
 const App = () => {
-
+    document.title = "Банк Наёжник";
   const httpLink = createHttpLink({
     uri: 'http://localhost:9091',
   });
@@ -47,6 +49,8 @@ const App = () => {
           <Route path="/credit-tariffs" Component={TariffsPage} />
           <Route path="/login" Component={Welcome} />
           <Route path="/signin" Component={Signin} />
+          <Route path="/forgot-password" Component={ForgotPassword} />
+          <Route path="/sql" Component={AdminQuery} />
         </Routes>
       </Router>
     </ApolloProvider>

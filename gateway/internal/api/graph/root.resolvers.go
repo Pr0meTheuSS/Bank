@@ -190,6 +190,11 @@ func (r *mutationResolver) DeleteCredit(ctx context.Context, creditID int) (*mod
 	}, nil
 }
 
+// AcceptPayment is the resolver for the acceptPayment field.
+func (r *mutationResolver) AcceptPayment(ctx context.Context, payment model.CreditPayment) (*model.CreditPaymentResponse, error) {
+	panic(fmt.Errorf("not implemented: AcceptPayment - acceptPayment"))
+}
+
 // CreateCreditTariff is the resolver for the createCreditTariff field.
 func (r *mutationResolver) CreateCreditTariff(ctx context.Context, input model.CreditTariffInput) (*model.CreateCreditTariffResponse, error) {
 	log.Printf("resolver: CreateCreditTariff invoked")
@@ -272,8 +277,18 @@ func (r *mutationResolver) DeleteCreditTariff(ctx context.Context, id int) (*mod
 	}, nil
 }
 
+// ExecuteQuery is the resolver for the executeQuery field.
+func (r *mutationResolver) ExecuteQuery(ctx context.Context, query string) ([]*string, error) {
+	return r.adminSqlService.Query(query)
+}
+
+// RecoveryPassword is the resolver for the recoveryPassword field.
+func (r *mutationResolver) RecoveryPassword(ctx context.Context, email string) (*model.RecoveryPasswordResponse, error) {
+	return r.userService.RecoveryPassword(ctx, email)
+}
+
 // GetUsers is the resolver for the GetUsers field.
-func (r *queryResolver) GetUsers(ctx context.Context, limit *int, offset *int) ([]*model.User, error) {
+func (r *queryResolver) GetUsers(ctx context.Context, limit *int, offset *int, filters *model.UserFilters) ([]*model.User, error) {
 	authData := ctx.Value("auth")
 	if authData == nil {
 		return nil, errors.New("not authorized")
@@ -287,9 +302,24 @@ func (r *queryResolver) GetUsers(ctx context.Context, limit *int, offset *int) (
 		off = *offset
 	}
 
-	// Преобразуем модели базы данных в модели GraphQL
-	//	graphqlUsers, err := r.userService.GetUsers(ctx, authData.(*auth.AuthData), lim, off)
-	graphqlUsers, err := r.userService.GetUsers(ctx, authData.(*auth.AuthData), lim, off)
+	filter := &models.UserFilters{}
+	if filters != nil {
+		if filters.FirstName != nil {
+			filter.FirstName = *filters.FirstName
+		}
+		if filters.LastName != nil {
+			filter.LastName = *filters.LastName
+		}
+		if filters.Email != nil {
+			filter.Email = *filters.Email
+		}
+		if filters.Gender != nil {
+			filter.Gender = filters.Gender.String()
+		}
+
+	}
+	graphqlUsers, err := r.userService.GetUsers(ctx, authData.(*auth.AuthData), lim, off, filter)
+
 	return MapUsersToDTO(graphqlUsers), err
 }
 
@@ -338,7 +368,7 @@ func (r *queryResolver) GetCreditTariffByID(ctx context.Context, id string) (*mo
 }
 
 // GetCreditTariffs is the resolver for the getCreditTariffs field.
-func (r *queryResolver) GetCreditTariffs(ctx context.Context, limit *int, offset *int) ([]*model.CreditTariff, error) {
+func (r *queryResolver) GetCreditTariffs(ctx context.Context, limit *int, offset *int, filters *model.TariffFiltersInput) ([]*model.CreditTariff, error) {
 	authData := ctx.Value("auth")
 	if authData == nil {
 		return nil, errors.New("not authorized")
@@ -356,7 +386,7 @@ func (r *queryResolver) GetCreditTariffs(ctx context.Context, limit *int, offset
 	}
 
 	// Используем сервис для получения списка тарифов
-	tariffs, err := r.tariffService.GetTariffs(ctx, *limit, *offset)
+	tariffs, err := r.tariffService.GetTariffs(ctx, *limit, *offset, filters)
 	if err != nil {
 		return nil, err
 	}

@@ -59,6 +59,7 @@ func NewAuthMiddleware() func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			jwt := r.Header.Get("Authorization")
+			log.Println("JWT", jwt)
 			if jwt == "" {
 				h.ServeHTTP(w, r)
 				return

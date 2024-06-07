@@ -67,3 +67,10 @@ type LoginResponse struct {
 	User  User   `json:"user"`
 	Token string `json:"token"`
 }
+
+type UserFilters struct {
+	FirstName string
+	LastName  string
+	Email     string
+	Gender    string
+}

@@ -110,6 +110,8 @@ func (r *creditRepositoryImpl) GetAllForUser(userID uint) ([]*models.Credit, err
 }
 
 func (r *creditRepositoryImpl) GetAll(limit int, offset int, filters *model.CreditFilters) ([]*models.Credit, error) {
+	log.Println("Credit Repository GetAll invoked")
+
 	var credits []*models.Credit
 	query := r.db
 
@@ -142,5 +144,6 @@ func (r *creditRepositoryImpl) GetAll(limit int, offset int, filters *model.Cred
 	if err != nil {
 		return nil, err
 	}
+	log.Println(credits)
 	return credits, nil
 }

@@ -15,7 +15,7 @@ type TariffService interface {
 	Update(ctx context.Context, authData *auth.AuthData, tariff *models.Tariff) error
 	Delete(ctx context.Context, authData *auth.AuthData, ID int) error
 	GetByID(ctx context.Context, ID int) (*models.Tariff, error)
-	GetTariffs(ctx context.Context, limit int, offset int) ([]*models.Tariff, error)
+	GetTariffs(ctx context.Context, limit int, offset int, filters *model.TariffFiltersInput) ([]*models.Tariff, error)
 }
 
 // TariffServiceImpl реализует интерфейс TariffService
@@ -102,10 +102,10 @@ func (s *TariffServiceImpl) GetByID(ctx context.Context, ID int) (*models.Tariff
 	}, nil
 }
 
-// GetTariffs возвращает список кредитных тарифов с пагинацией
-func (s *TariffServiceImpl) GetTariffs(ctx context.Context, limit int, offset int) ([]*models.Tariff, error) {
+// GetTariffs возвращает список кредитных тарифов с пагинацией и фильтрацией
+func (s *TariffServiceImpl) GetTariffs(ctx context.Context, limit int, offset int, filters *model.TariffFiltersInput) ([]*models.Tariff, error) {
 	var tariffs []*models.Tariff
-	creditTariffs, err := s.repository.GetAll(limit, offset)
+	creditTariffs, err := s.repository.GetAll(limit, offset, filters)
 	if err != nil {
 		return nil, err
 	}

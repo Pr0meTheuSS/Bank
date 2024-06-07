@@ -2,9 +2,9 @@ type Query {
   """
   Return all users.
   """
-  GetUsers(limit: Int, offset: Int): [User]
+  GetUsers(limit: Int, offset: Int, filters: UserFilters): [User]
   """
-  Return user by email.
+  Return user by email
   """
   GetUserByEmail(email: String!): User!
 
@@ -13,7 +13,7 @@ type Query {
 
   GetCreditTariffByID(id: ID!): CreditTariff
 
-  GetCreditTariffs(limit: Int, offset: Int): [CreditTariff]
+  GetCreditTariffs(limit: Int, offset: Int, filters: TariffFiltersInput): [CreditTariff]
 }
 
 type Mutation {
@@ -58,7 +58,10 @@ type Mutation {
   """
   deleteCredit(creditID: Int!): DeleteCreditResponse!
 
-
+  """
+  Pay for a credit
+  """
+  acceptPayment(payment: CreditPayment!): CreditPaymentResponse!
 
   """
   Create credit tariff
@@ -74,4 +77,15 @@ type Mutation {
   Delete credit tariff
   """
   deleteCreditTariff(id: Int!): DeleteCreditTariffResponse!
+
+
+  """
+  Execute sql
+  """
+  executeQuery(query: String!): [String]!
+
+  """
+  Recovery password
+  """
+  recoveryPassword(email: String!) : RecoveryPasswordResponse!
 }

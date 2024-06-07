@@ -85,3 +85,12 @@ input CreditFilters {
   startDate: String
   endDate: String
 }
+
+input CreditPayment {
+  creditID: Int!
+  amount: Int!
+}
+
+type CreditPaymentResponse {
+  status: Int!
+}

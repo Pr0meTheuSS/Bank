@@ -19,3 +19,5 @@ query GetCredits($limit: Int, $offset: Int, $filters: CreditFilters) {
   }
 }
 `;
+
+export default GET_CREDITS;

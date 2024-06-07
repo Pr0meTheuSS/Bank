@@ -3,24 +3,29 @@ package UserService
 import (
 	"context"
 	"errors"
+	"fmt"
 	auth "gateway/internal"
 	"gateway/internal/api/graph/model"
 	"gateway/internal/mail"
 	"gateway/internal/models"
 	userrepository "gateway/internal/repositories/user_repository"
 	"log"
+	"math/rand"
 )
+
+var _ UserService = (*UserServiceImpl)(nil)
 
 type UserService interface {
 	Register(ctx context.Context, request *models.RegistrationRequest) (*models.RegistrationResponse, error)
 	Login(ctx context.Context, request *models.LoginRequest) (*models.LoginResponse, error)
+	RecoveryPassword(ctx context.Context, email string) (*model.RecoveryPasswordResponse, error)
 
 	Create(ctx context.Context, authData *auth.AuthData, user *models.User) (*models.User, error)
 	Update(ctx context.Context, authData *auth.AuthData, userID int, user *models.User) (*models.User, error)
 	Delete(ctx context.Context, authData *auth.AuthData, userID int) error
 
 	GetUserByEmail(ctx context.Context, authData *auth.AuthData, email string) (*models.User, error)
-	GetUsers(ctx context.Context, authData *auth.AuthData, limit int, offset int) ([]*models.User, error)
+	GetUsers(ctx context.Context, authData *auth.AuthData, limit int, offset int, filters *models.UserFilters) ([]*models.User, error)
 }
 
 type UserServiceImpl struct {
@@ -34,8 +39,26 @@ func NewUserService(userRepo userrepository.UserRepository) UserService {
 }
 
 const (
-	welcomeEmailMessage = "Банк Надёжник приветствует Вас! Благодарим за регистрацию!"
+	welcomeEmailMessage                 = "Банк Надёжник приветствует Вас! Благодарим за регистрацию!"
+	recoveryPasswordMessageFormatString = "Восстановление доступа к аккаунту в банке Надежник. Используйте пароль: %s"
 )
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/"
+
+func GenerateRandomPassword() string {
+	// Определяем длину пароля (от 10 до 16 символов)
+	length := rand.Intn(7) + 10
+
+	// Создаем слайс байтов для пароля
+	password := make([]byte, length)
+
+	// Заполняем слайс случайными символами из charset
+	for i := range password {
+		password[i] = charset[rand.Intn(len(charset))]
+	}
+
+	return string(password)
+}
 
 func (s *UserServiceImpl) Register(ctx context.Context,
 	request *models.RegistrationRequest,
@@ -89,6 +112,28 @@ func (s *UserServiceImpl) Login(ctx context.Context,
 			Role:         models.UserRole(user.Role),
 		},
 		Token: jwt,
+	}, nil
+}
+
+func (s *UserServiceImpl) RecoveryPassword(ctx context.Context, email string) (*model.RecoveryPasswordResponse, error) {
+	user, err := s.userRepo.GetByEmail(email)
+	if err != nil || user == nil {
+		return &model.RecoveryPasswordResponse{
+			Status: 400,
+		}, err
+	}
+
+	user.Password = GenerateRandomPassword()
+	if _, err = s.userRepo.Update(int(user.ID), user); err != nil {
+		return &model.RecoveryPasswordResponse{
+			Status: 400,
+		}, err
+	}
+
+	go mail.SendConfirmMail(user.Email, fmt.Sprintf(recoveryPasswordMessageFormatString, user.Password))
+
+	return &model.RecoveryPasswordResponse{
+		Status: 200,
 	}, nil
 }
 
@@ -172,7 +217,7 @@ func (s *UserServiceImpl) Delete(ctx context.Context, authData *auth.AuthData, u
 	return s.userRepo.Delete(userID)
 }
 
-func (s *UserServiceImpl) GetUsers(ctx context.Context, authData *auth.AuthData, limit int, offset int) ([]*models.User, error) {
+func (s *UserServiceImpl) GetUsers(ctx context.Context, authData *auth.AuthData, limit int, offset int, filters *models.UserFilters) ([]*models.User, error) {
 	log.Println("GetAllUsers Service")
 	u, err := s.GetUserByEmail(ctx, authData, authData.UserEmail)
 	if err != nil {
@@ -186,8 +231,8 @@ func (s *UserServiceImpl) GetUsers(ctx context.Context, authData *auth.AuthData,
 		return []*models.User{u}, nil
 	}
 
-	// Получаем пользователей из репозитория с указанием ограничения и смещения
-	users, err := s.userRepo.GetUsers(limit, offset)
+	// Получаем пользователей из репозитория с фильтрами
+	users, err := s.userRepo.GetUsers(limit, offset, filters)
 	if err != nil {
 		return nil, err
 	}

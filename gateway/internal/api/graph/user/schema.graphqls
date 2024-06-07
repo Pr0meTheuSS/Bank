@@ -131,3 +131,14 @@ type DeleteUserResponse {
 type CreateUserResponse {
   status: Int!
 }
+
+type RecoveryPasswordResponse {
+  status:Int!
+}
+
+input UserFilters {
+  firstName: String
+  lastName: String
+  email: String
+  gender: Gender
+}

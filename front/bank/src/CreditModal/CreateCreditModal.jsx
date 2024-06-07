@@ -40,6 +40,12 @@ const CreateCreditModal = ({ open, onClose, credit = {}, onCreateCredit }) => {
       setErrors(validationErrors);
       return;
     }
+
+    var date = new Date(formData.startDate);
+    formData.startDate = date.toISOString();
+    var date = new Date(formData.endDate);
+    formData.endDate = date.toISOString();
+
     onCreateCredit(formData);
     onClose();
   };
@@ -136,7 +142,7 @@ const CreateCreditModal = ({ open, onClose, credit = {}, onCreateCredit }) => {
           error={!!errors.paymentType}
           helperText={errors.paymentType}
         >
-          <MenuItem value="ANNUITY">Аннуитетный</MenuItem>
+          <MenuItem value="Annuity">Аннуитетный</MenuItem>
           <MenuItem value="DIFFERENTIATED">Дифференцированный</MenuItem>
         </TextField>
         <TextField

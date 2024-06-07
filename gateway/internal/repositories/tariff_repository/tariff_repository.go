@@ -1,6 +1,7 @@
 package tariffrepository
 
 import (
+	"gateway/internal/api/graph/model"
 	"log"
 	"time"
 
@@ -38,13 +39,24 @@ type CreditTariff struct {
 	UpdatedAt time.Time
 }
 
+// TariffFilters представляет фильтры для кредитных тарифов
+type TariffFilters struct {
+	Name            *string
+	MinAmount       *float64
+	MaxAmount       *float64
+	MinInterestRate *float64
+	MaxInterestRate *float64
+	MinTermMonth    *uint
+	MaxTermMonth    *uint
+}
+
 // CreditTariffRepository предоставляет методы для работы с кредитными тарифами
 type CreditTariffRepository interface {
 	Create(tariff *CreditTariff) error
 	FindByID(id uint) (*CreditTariff, error)
 	Update(tariff *CreditTariff) error
 	Delete(id uint) error
-	GetAll(limit int, offset int) ([]*CreditTariff, error)
+	GetAll(limit int, offset int, filters *model.TariffFiltersInput) ([]*CreditTariff, error)
 }
 
 type creditTariffRepositoryImpl struct {
@@ -93,10 +105,34 @@ func (r *creditTariffRepositoryImpl) Delete(id uint) error {
 	return r.db.Delete(&CreditTariff{}, id).Error
 }
 
-// GetAll возвращает список кредитных тарифов с учетом лимита и смещения
-func (r *creditTariffRepositoryImpl) GetAll(limit int, offset int) ([]*CreditTariff, error) {
+// GetAll возвращает список кредитных тарифов с учетом лимита, смещения и фильтрации
+func (r *creditTariffRepositoryImpl) GetAll(limit int, offset int, filters *model.TariffFiltersInput) ([]*CreditTariff, error) {
 	var tariffs []*CreditTariff
-	if err := r.db.Limit(limit).Offset(offset).Find(&tariffs).Error; err != nil {
+	query := r.db.Limit(limit).Offset(offset)
+	if filters != nil {
+		if filters.Name != nil {
+			query = query.Where("name LIKE ?", "%"+*filters.Name+"%")
+		}
+		if filters.MinAmount != nil {
+			query = query.Where("min_amount >= ?", *filters.MinAmount)
+		}
+		if filters.MaxAmount != nil {
+			query = query.Where("max_amount <= ?", *filters.MaxAmount)
+		}
+		if filters.MinInterestRate != nil {
+			query = query.Where("min_interest_rate >= ?", *filters.MinInterestRate)
+		}
+		if filters.MaxInterestRate != nil {
+			query = query.Where("max_interest_rate <= ?", *filters.MaxInterestRate)
+		}
+		if filters.MinTermMonth != nil {
+			query = query.Where("min_term_month >= ?", *filters.MinTermMonth)
+		}
+		if filters.MaxTermMonth != nil {
+			query = query.Where("max_term_month <= ?", *filters.MaxTermMonth)
+		}
+	}
+	if err := query.Find(&tariffs).Error; err != nil {
 		return nil, err
 	}
 	return tariffs, nil

@@ -1,0 +1,17 @@
+INSERT INTO db_users (created_at, updated_at, first_name, second_name, last_name, email, password, birth_date, gender, passport_data, status, is_blocked, is_admin, is_employee, is_client) VALUES    
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Иван', 'Иванович', 'Иванов', 'ivan@example.com', 'password123', '1990-01-01', 'MALE', '1234567890', 'VERIFIED', FALSE, TRUE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Петр', 'Петрович', 'Петров', 'petr@example.com', 'password123', '1985-02-15', 'MALE', '0987654321', 'VERIFIED', FALSE, TRUE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Мария', 'Ивановна', 'Сидорова', 'maria@example.com', 'password123', '1995-07-20', 'FEMALE', '1357924680', 'VERIFIED', FALSE, FALSE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Анна', 'Петровна', 'Кузнецова', 'anna@example.com', 'password123', '1988-11-30', 'FEMALE', '2468013579', 'VERIFIED', FALSE, FALSE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Александр', 'Александрович', 'Смирнов', 'alex@example.com', 'password123', '1993-04-10', 'MALE', '9876543210', 'VERIFIED', FALSE, FALSE, TRUE, FALSE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Елена', 'Владимировна', 'Иванова', 'elena@example.com', 'password123', '1986-09-25', 'FEMALE', '0123456789', 'VERIFIED', FALSE, FALSE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Дмитрий', 'Андреевич', 'Сергеев', 'dmitry@example.com', 'password123', '1992-03-05', 'MALE', '9870123456', 'VERIFIED', FALSE, TRUE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Ольга', 'Дмитриевна', 'Петрова', 'olga@example.com', 'password123', '1997-08-15', 'FEMALE', '6789012345', 'VERIFIED', FALSE, FALSE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Артем', 'Сергеевич', 'Козлов', 'artem@example.com', 'password123', '1991-05-20', 'MALE', '4567890123', 'VERIFIED', FALSE, TRUE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Светлана', 'Александровна', 'Новикова', 'svetlana@example.com', 'password123', '1984-12-10', 'FEMALE', '3456789012', 'VERIFIED', FALSE, FALSE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Игорь', 'Олегович', 'Савельев', 'igor@example.com', 'password123', '1994-06-30', 'MALE', '2345678901', 'VERIFIED', FALSE, TRUE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Наталья', 'Игоревна', 'Тимофеева', 'natalia@example.com', 'password123', '1987-01-15', 'FEMALE', '1234567890', 'VERIFIED', FALSE, FALSE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Владимир', 'Павлович', 'Калинин', 'vladimir@example.com', 'password123', '1996-10-20', 'MALE', '0123456789', 'VERIFIED', FALSE, TRUE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Татьяна', 'Владимировна', 'Андреева', 'tatyana@example.com', 'password123', '1989-07-05', 'FEMALE', '9012345678', 'VERIFIED', FALSE, FALSE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Алексей', 'Михайлович', 'Попов', 'alexey@example.com', 'password123', '1990-02-28', 'MALE', '8901234567', 'VERIFIED', FALSE, TRUE, FALSE, TRUE),
+('2024-06-05 12:00:00', '2024-06-05 12:00:00', 'Ирина', 'Сергеевна', 'Семенова', 'irina@example.com', 'password123', '1993-09-10', 'FEMALE', '7890123456', 'VERIFIED', FALSE, FALSE, FALSE, TRUE);

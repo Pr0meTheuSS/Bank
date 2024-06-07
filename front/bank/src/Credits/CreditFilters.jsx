@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Paper, TextField, MenuItem, Button } from '@mui/material';
 
-const CreditFilters = ({ filters, setFilters, applyFilters }) => {
+const CreditFilters = ({onSetFilters,  applyFilters }) => {
+    
+    const [filters, setFilters] = useState({});
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters(prevFilters => {
@@ -69,7 +71,7 @@ const CreditFilters = ({ filters, setFilters, applyFilters }) => {
                 type="date"
                 style={{ marginBottom: '10px' }}
             />
-            <Button variant="contained" color="primary" onClick={applyFilters}>Применить фильтры</Button>
+            <Button variant="contained" color="primary" onClick={ () => {onSetFilters(filters); applyFilters();}}>Применить фильтры</Button>
         </Paper>
     );
 };

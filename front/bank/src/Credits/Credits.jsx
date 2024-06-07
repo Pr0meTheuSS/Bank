@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Container, MenuItem, Typography, Button, Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper, TextField } from '@mui/material';
+import React, { useState } from 'react';
+import { Container,  Typography, Button, Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper} from '@mui/material';
 import { useQuery, useMutation } from '@apollo/client';
 import CreateCreditModal from '../CreditModal/CreateCreditModal';
 import EditCreditModal from '../CreditModal/UpdateCreditModal';
@@ -7,6 +7,7 @@ import CustomAppBar from '../AppBar/AppBar';
 import { CREATE_CREDIT, UPDATE_CREDIT, DELETE_CREDIT } from './mutations';
 import { GET_CREDITS } from './queries';
 import { format } from 'date-fns';
+import CreditFilters from './CreditFilters';
 
 const CreditsPage = () => {
     const pageCreditsLimit = 10;
@@ -16,17 +17,17 @@ const CreditsPage = () => {
     const [isNewCreditModalOpen, setNewCreditModalOpen] = useState(false);
     const [isEditCreditModalOpen, setEditCreditModalOpen] = useState(false);
     const [selectedCredit, setSelectedCredit] = useState({});
-
+    
     const [createCreditMutation] = useMutation(CREATE_CREDIT, {
-        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters } }],
+        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters: filters } }],
     });
 
     const [updateCreditMutation] = useMutation(UPDATE_CREDIT, {
-        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters } }],
+        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters: filters } }],
     });
 
     const [deleteCreditMutation] = useMutation(DELETE_CREDIT, {
-        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters } }],
+        refetchQueries: [{ query: GET_CREDITS, variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters: filters } }],
     });
 
     const createCredit = () => {
@@ -37,12 +38,6 @@ const CreditsPage = () => {
         setSelectedCredit(credit);
         setEditCreditModalOpen(true);
     }
-
-    useEffect(() => {
-        setFilters({
-            ...filters,
-        });
-    }, [filters]);
 
     const deleteCredit = (creditID) => {
         deleteCreditMutation({ variables: { creditID } })
@@ -97,26 +92,13 @@ const CreditsPage = () => {
             });
     }
 
-    const { loading, error, data } = useQuery(GET_CREDITS, {
-        variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters }
+    const { loading, error, data, refetch } = useQuery(GET_CREDITS, {
+        variables: { limit: pageCreditsLimit, offset: pageCreditsOffset, filters: filters }
     });
-
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target;
-        setFilters(prevFilters => {
-            if (value === '') {
-                const { [name]: _, ...rest } = prevFilters;
-                return rest;
-            }
-            return {
-                ...prevFilters,
-                [name]: value
-            };
-        });
-    };
 
     const applyFilters = () => {
         setPageCreditsOffset(0);
+        refetch();
     };
 
     const handleNextPage = () => {
@@ -139,61 +121,7 @@ const CreditsPage = () => {
                 <Typography variant="h4" style={{ color: 'white' }}>Кредиты</Typography>
                 <Button variant="contained" color="primary" onClick={createCredit} style={{ marginBottom: '10px' }}>Добавить кредит</Button>
                 
-                <Paper style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', color: 'white' }}>
-                    <TextField
-                        label="ID пользователя"
-                        name="userID"
-                        value={filters.userID}
-                        onChange={handleFilterChange}
-                        style={{ marginBottom: '10px' }}
-                    />
-                    <TextField
-                        label="Активен"
-                        name="isActive"
-                        value={filters.isActive}
-                        onChange={handleFilterChange}
-                        style={{ marginBottom: '10px' }}
-                        select
-                    >
-                        <MenuItem value="">Все</MenuItem>
-                        <MenuItem value={true}>Да</MenuItem>
-                        <MenuItem value={false}>Нет</MenuItem>
-                    </TextField>
-                    <TextField
-                        label="Минимальная сумма"
-                        name="minAmount"
-                        value={filters.minAmount}
-                        onChange={handleFilterChange}
-                        type="number"
-                        style={{ marginBottom: '10px' }}
-                    />
-                    <TextField
-                        label="Максимальная сумма"
-                        name="maxAmount"
-                        value={filters.maxAmount}
-                        onChange={handleFilterChange}
-                        type="number"
-                        style={{ marginBottom: '10px' }}
-                    />
-                    <TextField
-                        label="Дата начала"
-                        name="startDate"
-                        value={filters.startDate}
-                        onChange={handleFilterChange}
-                        type="date"
-                        style={{ marginBottom: '10px' }}
-                    />
-                    <TextField
-                        label="Дата окончания"
-                        name="endDate"
-                        value={filters.endDate}
-                        onChange={handleFilterChange}
-                        type="date"
-                        style={{ marginBottom: '10px' }}
-                    />
-                    <Button variant="contained" color="primary" onClick={applyFilters}>Применить фильтры</Button>
-                </Paper>
-
+                <CreditFilters onSetFilters={setFilters} applyFilters={applyFilters}/>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -241,7 +169,7 @@ const CreditsPage = () => {
                 </TableContainer>
                 <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
                     <Button variant="contained" color="primary" onClick={handlePreviousPage} disabled={pageCreditsOffset === 0}>Назад</Button>
-                    <Button variant="contained" color="primary" onClick={handleNextPage}>Вперед</Button>
+                    <Button variant="contained" color="primary" onClick={handleNextPage} disabled={data.getCredits.length < pageCreditsLimit}>Вперед</Button>
                 </div>
                 <CreateCreditModal
                     open={isNewCreditModalOpen}

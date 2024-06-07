@@ -75,6 +75,15 @@ type CreditFilters struct {
 	EndDate   *string  `json:"endDate,omitempty"`
 }
 
+type CreditPayment struct {
+	CreditID int `json:"creditID"`
+	Amount   int `json:"amount"`
+}
+
+type CreditPaymentResponse struct {
+	Status int `json:"status"`
+}
+
 type CreditTariff struct {
 	ID              int         `json:"id"`
 	Name            string      `json:"name"`
@@ -130,6 +139,10 @@ type Mutation struct {
 type Query struct {
 }
 
+type RecoveryPasswordResponse struct {
+	Status int `json:"status"`
+}
+
 type RegistrationRequest struct {
 	UserDetails *RegistrationUserInput `json:"user_details"`
 	Password    string                 `json:"password"`
@@ -150,6 +163,16 @@ type RegistrationUserInput struct {
 	BirthDate    string   `json:"birth_date"`
 	Gender       Gender   `json:"gender"`
 	Role         UserRole `json:"role"`
+}
+
+type TariffFiltersInput struct {
+	Name            *string  `json:"name,omitempty"`
+	MinAmount       *int     `json:"minAmount,omitempty"`
+	MaxAmount       *int     `json:"maxAmount,omitempty"`
+	MinInterestRate *float64 `json:"minInterestRate,omitempty"`
+	MaxInterestRate *float64 `json:"maxInterestRate,omitempty"`
+	MinTermMonth    *int     `json:"minTermMonth,omitempty"`
+	MaxTermMonth    *int     `json:"maxTermMonth,omitempty"`
 }
 
 type UpdateCreditRequest struct {
@@ -211,6 +234,13 @@ type User struct {
 	Role         UserRole   `json:"role"`
 	Status       UserStatus `json:"status"`
 	IsBlocked    bool       `json:"is_blocked"`
+}
+
+type UserFilters struct {
+	FirstName *string `json:"firstName,omitempty"`
+	LastName  *string `json:"lastName,omitempty"`
+	Email     *string `json:"email,omitempty"`
+	Gender    *Gender `json:"gender,omitempty"`
 }
 
 type Gender string

@@ -1,27 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Container, Typography, Button, Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper } from '@mui/material';
 import { useQuery, useMutation } from '@apollo/client';
 import CreateUserModal from '../UserFormModal/CreateUserModal';
 import EditUserModal from '../UserFormModal/EditUserModal';
-import GET_USERS from './quieries';
+import UserCreditsModal from './UserCreditsModal'; // Новый компонент
+import GET_USERS from './queries';
 import { CREATE_USER, UPDATE_USER, DELETE_USER } from './mutations';
 import CustomAppBar from '../AppBar/AppBar';
+import UserFilters from './UserFilters';
 
 const UsersPage = () => {
-  const { loading, error, data } = useQuery(GET_USERS);
+  const pageUsersLimit = 10;
+  const [pageUsersOffset, setPageUsersOffset] = useState(0);
+  const [filters, setFilters] = useState({});
+  const [selectedUserID, setSelectedUserID] = useState(null); // Новый state для ID выбранного пользователя
+  const [creditsModalOpen, setCreditsModalOpen] = useState(false); // Новый state для управления модальным окном кредитов
+
+  const { loading, error, data, refetch } = useQuery(GET_USERS, {
+    variables: { limit: pageUsersLimit, offset: pageUsersOffset, filters: filters }
+  });
+
   const [deleteUser] = useMutation(DELETE_USER, {
-    refetchQueries: [{ query: GET_USERS }],
+    refetchQueries: [{ query: GET_USERS, variables: { limit: pageUsersLimit, offset: pageUsersOffset, filters: filters } }],
   });
   const [updateUser] = useMutation(UPDATE_USER, {
-    refetchQueries: [{ query: GET_USERS }],
+    refetchQueries: [{ query: GET_USERS, variables: { limit: pageUsersLimit, offset: pageUsersOffset, filters: filters } }],
   });
   const [createUser] = useMutation(CREATE_USER, {
-    refetchQueries: [{ query: GET_USERS }],
+    refetchQueries: [{ query: GET_USERS, variables: { limit: pageUsersLimit, offset: pageUsersOffset, filters: filters } }],
   });
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [isNewUserModalOpen, setNewUserModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState({});
+  
+  const clickedButtonRef = useRef(null);
 
   const onUpdateUser = (updatingUser) => {
     updateUser({ variables: { input: updatingUser } })
@@ -60,6 +73,33 @@ const UsersPage = () => {
     setEditModalOpen(false);
   };
 
+  const handleRowClick = (userID) => {
+    if (!clickedButtonRef.current) {
+      setSelectedUserID(userID);
+      setCreditsModalOpen(true);
+    }
+    clickedButtonRef.current = null; // Сбросим ссылку после выполнения
+  };
+
+  const handleButtonClick = (ref) => {
+    clickedButtonRef.current = ref;
+  };
+
+  const handleNextPage = () => {
+    setPageUsersOffset(pageUsersOffset + pageUsersLimit);
+  };
+
+  const handlePreviousPage = () => {
+    if (pageUsersOffset > 0) {
+      setPageUsersOffset(pageUsersOffset - pageUsersLimit);
+    }
+  };
+
+  const applyFilters = () => {
+    setPageUsersOffset(0);
+    refetch();
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -69,8 +109,9 @@ const UsersPage = () => {
       <Container>
         <Typography variant="h4">Пользователи</Typography>
         <Button variant="contained" color="primary" onClick={handleNewUser}>Создать пользователя</Button>
-        <TableContainer component={Paper}>
-          <Table>
+        <UserFilters onSetFilters={setFilters} applyFilters={applyFilters} />
+        <TableContainer sx={{ minWidth: '75vw' }} component={Paper}>
+          <Table sx={{ minWidth: '80vw' }}>
             <TableHead>
               <TableRow>
                 <TableCell>ID</TableCell>
@@ -89,8 +130,8 @@ const UsersPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.GetUsers.map((user) => (
-                <TableRow key={user.ID}>
+              {data.GetUsers && data.GetUsers.map((user) => (
+                <TableRow key={user.ID} onClick={() => handleRowClick(user.ID)} style={{ cursor: 'pointer' }}>
                   <TableCell>{user.ID}</TableCell>
                   <TableCell>{user.first_name}</TableCell>
                   <TableCell>{user.second_name}</TableCell>
@@ -104,14 +145,18 @@ const UsersPage = () => {
                   <TableCell>{user.status}</TableCell>
                   <TableCell>{user.is_blocked ? 'Да' : 'Нет'}</TableCell>
                   <TableCell>
-                    <Button onClick={() => handleEditUser(user)} color="primary">Редактировать</Button>
-                    <Button onClick={() => handleDeleteUser(user.ID)} color="secondary">Удалить</Button>
+                    <Button onClick={() => { handleButtonClick('edit'); handleEditUser(user); }} color="primary">Редактировать</Button>
+                    <Button onClick={() => { handleButtonClick('delete'); handleDeleteUser(user.ID); }} color="secondary">Удалить</Button>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
+          <Button variant="contained" color="primary" onClick={handlePreviousPage} disabled={pageUsersOffset === 0}>Назад</Button>
+          <Button variant="contained" color="primary" onClick={handleNextPage} disabled={data.GetUsers && data.GetUsers.length < pageUsersLimit }>Вперед</Button>
+        </div>
         <EditUserModal
           open={editModalOpen}
           onClose={() => setEditModalOpen(false)}
@@ -123,6 +168,11 @@ const UsersPage = () => {
           onClose={() => setNewUserModalOpen(false)}
           onCreateUser={onCreateUser}
           user={{}}
+        />
+        <UserCreditsModal
+          open={creditsModalOpen}
+          onClose={() => setCreditsModalOpen(false)}
+          userID={selectedUserID}
         />
       </Container>
     </>

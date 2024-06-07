@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation, gql } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 import InputWrapperWindow from '../InputWrapperWindow/InputWrapperWindow';
-import { TextField } from '@mui/material';
+import { TextField, Button, Link, Typography, Box } from '@mui/material';
 
 const LOGIN_USER = gql`
   mutation LoginUser($loginRequest: LoginRequest!) {
@@ -44,12 +44,43 @@ const Login = () => {
   return (
     <InputWrapperWindow>
       <form className='login-form' onSubmit={handleSubmit(onSubmit)}>
-        <TextField placeholder={"Введите email"}  required={true} {...register('email')} />
-        <TextField type="password" error={errors.password} helperText={errors.password && "Пароль обязателен"} {...register('password')} />
+        <TextField 
+          placeholder="Введите email" 
+          variant="outlined"
+          fullWidth
+          InputProps={{ style: { color: 'white' } }} 
+          InputLabelProps={{ style: { color: 'white' } }}
+          required
+          {...register('email', { required: 'Email обязателен' })}
+          error={!!errors.email}
+          helperText={errors.email ? errors.email.message : ''}
+          style={{ marginBottom: '1rem' }}
+        />
+        <TextField 
+          type="password" 
+          placeholder="Введите пароль" 
+          variant="outlined"
+          fullWidth
+          InputProps={{ style: { color: 'white' } }} 
+          InputLabelProps={{ style: { color: 'white' } }}
+          {...register('password', { required: 'Пароль обязателен' })}
+          error={!!errors.password}
+          helperText={errors.password ? errors.password.message : ''}
+          style={{ marginBottom: '1rem' }}
+        />
 
-        <button type="submit">Войти</button>
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Войти
+        </Button>
 
-        <a href='/signin' className='link'>Зарегистрироваться</a>
+        <Box mt={2} display="flex" justifyContent="space-between">
+          <Link href='/forgot-password' color="inherit">
+            Восстановить пароль
+          </Link>
+          <Link href='/signin' color="inherit">
+            Зарегистрироваться
+          </Link>
+        </Box>
       </form>
     </InputWrapperWindow>
   );

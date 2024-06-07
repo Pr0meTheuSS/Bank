@@ -14,7 +14,7 @@ type UserRepository interface {
 	Update(id int, user *models.User) (*models.User, error)
 	Delete(id int) error
 
-	GetUsers(limit, offset int) ([]*models.User, error)
+	GetUsers(limit, offset int, filters *models.UserFilters) ([]*models.User, error)
 	GetByID(id int) (*models.User, error)
 	GetByEmail(email string) (*models.User, error)
 }
@@ -113,18 +113,30 @@ func (ur *userRepositoryImpl) GetByEmail(email string) (*models.User, error) {
 	return &ret, nil
 }
 
-func (ur *userRepositoryImpl) GetUsers(limit int, offset int) ([]*models.User, error) {
+func (ur *userRepositoryImpl) GetUsers(limit int, offset int, filters *models.UserFilters) ([]*models.User, error) {
 	var users []*DBUser
+	query := ur.db.Offset(offset)
 
-	if limit == 0 {
-		if err := ur.db.Offset(offset).Find(&users).Error; err != nil {
-			return nil, err
+	if filters != nil {
+		if filters.FirstName != "" {
+			query = query.Where("first_name ILIKE ?", "%"+filters.FirstName+"%")
 		}
-
-		return MapDBUsersToModelUsers(users), nil
+		if filters.LastName != "" {
+			query = query.Where("last_name ILIKE ?", "%"+filters.LastName+"%")
+		}
+		if filters.Email != "" {
+			query = query.Where("email ILIKE ?", "%"+filters.Email+"%")
+		}
+		if filters.Gender != "" {
+			query = query.Where("gender = ?", filters.Gender)
+		}
 	}
 
-	if err := ur.db.Limit(limit).Offset(offset).Find(&users).Error; err != nil {
+	if limit != 0 {
+		query = query.Limit(limit)
+	}
+
+	if err := query.Find(&users).Error; err != nil {
 		return nil, err
 	}
 

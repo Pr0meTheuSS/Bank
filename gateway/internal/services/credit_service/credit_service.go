@@ -7,6 +7,7 @@ import (
 	"gateway/internal/api/graph/model"
 	"gateway/internal/models"
 	creditrepository "gateway/internal/repositories/credit_repository"
+	"log"
 )
 
 type CreditService interface {
@@ -61,6 +62,7 @@ func (s *CreditServiceImpl) GetCreditByUserID(ctx context.Context, auth *auth.Au
 }
 
 func (s *CreditServiceImpl) GetCredits(ctx context.Context, auth *auth.AuthData, limit int, offset int, filters *model.CreditFilters) ([]*models.Credit, error) {
+	log.Println("Credit Service GetCredits invoked")
 	if auth.Role != model.UserRoleAdmin {
 		return nil, errors.New("access denied")
 	}

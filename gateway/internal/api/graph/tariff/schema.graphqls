@@ -41,3 +41,13 @@ type UpdateCreditTariffResponse {
 type DeleteCreditTariffResponse {
   status: Int!
 }
+
+input TariffFiltersInput {
+  name: String
+  minAmount: Int
+  maxAmount: Int
+  minInterestRate: Float
+  maxInterestRate: Float
+  minTermMonth: Int
+  maxTermMonth: Int
+}

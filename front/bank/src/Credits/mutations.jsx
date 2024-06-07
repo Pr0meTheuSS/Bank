@@ -54,3 +54,10 @@ export const DELETE_CREDIT = gql`
     }
   }
 `;
+
+export const ACCEPT_PAYMENT = gql`
+mutation acceptPayment($payment: CreditPayment!) {
+  acceptPayment(payment: $payment) {
+    status
+  }
+}`;
